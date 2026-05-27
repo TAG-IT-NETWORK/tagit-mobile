@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "ORACULAR",
+    "slug": "tagit-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0A0A",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#0A0A0A"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0A"
+      },
+      "package": "network.tagit.oracular"
+    },
+    "plugins": [
+      [
+        "react-native-nfc-manager",
+        {
+          "nfcPermission": "ORACULAR needs NFC to scan TAG IT chips",
+          "selectIdentifiers": [],
+          "systemCodes": []
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}

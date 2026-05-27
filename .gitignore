@@ -3,3 +3,13 @@ node_modules/
 dist/
 out/
 .DS_Store
+android/
+ios/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
