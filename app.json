@@ -2,6 +2,7 @@
   "expo": {
     "name": "ORACULAR",
     "slug": "tagit-mobile",
+    "scheme": "oracular",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -9,6 +10,14 @@
     "icon": "./assets/icon.png",
     "splash": {
       "backgroundColor": "#0A0A0A"
+    },
+    "ios": {
+      "bundleIdentifier": "network.tagit.oracular",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NFCReaderUsageDescription": "ORACULAR uses NFC to verify the authenticity of your TAG IT–chipped items.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
