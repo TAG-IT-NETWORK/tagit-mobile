@@ -23,7 +23,10 @@
       "adaptiveIcon": {
         "backgroundColor": "#0A0A0A"
       },
-      "package": "network.tagit.oracular"
+      "package": "network.tagit.oracular",
+      "permissions": [
+        "android.permission.NFC"
+      ]
     },
     "plugins": [
       [
@@ -35,6 +38,11 @@
         }
       ],
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d94951b3-09c7-46d1-85ad-d70e7fe2959e"
+      }
+    }
   }
 }
