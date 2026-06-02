@@ -3,6 +3,7 @@ import { useNfcScan, type NfcStatus } from "./useNfcScan";
 import { buildVerifyRequest, verifyAsset, VerifyApiError } from "../services/api";
 import { verifySunViaWeb } from "../services/sunVerify";
 import { parseSunUrl } from "../services/nfc";
+import { NfcError } from "react-native-nfc-manager";
 import { generateChallenge, checkApiHealth } from "../services/challenge";
 import { addToHistory } from "../services/history";
 import { DEMO_NFC_PAYLOAD } from "../config/constants";
@@ -113,11 +114,23 @@ export function useVerify(): UseVerifyResult {
       await addToHistory(buildScanRecord(response, ch, sun));
       setPhase("done");
     } catch (err) {
+      // iOS Core NFC's system scan sheet rejects with NfcError.UserCancel (which
+      // carries an EMPTY message) when the user taps Cancel, and the in-app Cancel
+      // aborts the pending scan the same way — neither is a real failure, so reset
+      // to idle silently instead of flashing the red error banner.
       const msg = err instanceof VerifyApiError
         ? `API Error (${err.statusCode}): ${err.message}`
         : err instanceof Error
           ? err.message
           : "Verification failed";
+      const cancelled =
+        err instanceof NfcError.UserCancel ||
+        /user ?cancel|cancell?ed|session is invalidated|system resource unavailable/i.test(msg);
+      if (cancelled) {
+        setPhase("idle");
+        setError(null);
+        return;
+      }
       setError(msg);
       setPhase("error");
     }

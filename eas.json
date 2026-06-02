@@ -1,13 +1,16 @@
 {
   "cli": {
-    "version": ">= 13.0.0"
+    "version": ">= 20.0.0"
   },
   "build": {
     "preview": {
+      "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
-      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
         "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
@@ -16,8 +19,35 @@
     },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
+        "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+      }
     },
-    "production": {}
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
+        "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "info@tagit.network",
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_10CHAR_TEAM_ID"
+      }
+    }
   }
 }

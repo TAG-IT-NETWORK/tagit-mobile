@@ -4,6 +4,7 @@
     "slug": "tagit-mobile",
     "scheme": "oracular",
     "version": "0.1.0",
+    "newArchEnabled": false,
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0A0A",

@@ -1,9 +1,13 @@
 /**
  * Runtime config from environment.
- * For Expo, env vars are baked in at build time via app.json extra or .env.
- * Defaults work for Android emulator → local backend.
+ * For Expo, env vars are baked in at build time via the eas.json profile `env`
+ * block (NOT .env — EAS does not read it) or .env for local `expo start`.
+ * The fallback is the live HTTPS backend so a misconfigured build fails loudly
+ * over HTTPS rather than silently hitting an iOS-ATS-blocked cleartext host.
  */
-export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:3100";
+export const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ??
+  "https://tagit-services-31154571939.us-central1.run.app";
 export const API_KEY = process.env.EXPO_PUBLIC_API_KEY ?? "";
 
 /**

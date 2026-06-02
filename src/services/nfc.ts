@@ -11,10 +11,17 @@ export async function initNfc(): Promise<boolean> {
 
 /** Request NDEF technology and read the first NDEF URL record */
 export async function scanNfcTag(): Promise<string> {
-  await NfcManager.requestTechnology(NfcTech.Ndef);
+  // On iOS this message is shown on the mandatory system "Ready to Scan" sheet;
+  // on Android there is no system sheet (the app renders its own hint) so the
+  // option is simply ignored.
+  await NfcManager.requestTechnology(NfcTech.Ndef, {
+    alertMessage: "Hold your TAG IT chip near the top of your iPhone",
+  });
   try {
     const tag = await NfcManager.getTag();
     if (!tag?.ndefMessage?.length) {
+      // setAlertMessage updates the iOS sheet text; it's a no-op on Android.
+      await NfcManager.setAlertMessage("No chip detected — try again");
       throw new Error("No NDEF message found on tag");
     }
 
@@ -23,7 +30,10 @@ export async function scanNfcTag(): Promise<string> {
       if (record.tnf === Ndef.TNF_WELL_KNOWN) {
         const payload = new Uint8Array(record.payload as unknown as number[]);
         const uri = Ndef.uri.decodePayload(payload);
-        if (uri) return uri;
+        if (uri) {
+          await NfcManager.setAlertMessage("Chip read");
+          return uri;
+        }
       }
     }
 
@@ -31,9 +41,13 @@ export async function scanNfcTag(): Promise<string> {
     for (const record of tag.ndefMessage) {
       const payload = new Uint8Array(record.payload as unknown as number[]);
       const text = Ndef.text.decodePayload(payload);
-      if (text?.startsWith("http")) return text;
+      if (text?.startsWith("http")) {
+        await NfcManager.setAlertMessage("Chip read");
+        return text;
+      }
     }
 
+    await NfcManager.setAlertMessage("Unrecognized chip");
     throw new Error("No URL record found in NDEF message");
   } finally {
     NfcManager.cancelTechnologyRequest().catch(() => {});
