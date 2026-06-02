@@ -43,28 +43,34 @@ export async function scanNfcTag(): Promise<string> {
 /**
  * Parse an NTAG 424 DNA SUN URL into structured data.
  *
- * Expected URL formats:
- *   https://tagit.network/verify?uid=049F50...&ctr=000005&cmac=2446E5...&t=1
- *   https://example.com/v?picc_data=...&cmac=...
- *
- * The NTAG 424 DNA chip automatically embeds UID, counter, and CMAC
- * into the NDEF URL on each tap via SUN (Secure Unique NFC) mirroring.
+ * Two SUN formats are supported:
+ *   ENCRYPTED PICC (real chips, what tagit-nfc-bridge personalizes):
+ *     https://verify.tagit.network/sun?picc=<32 hex>&cmac=<16 hex>
+ *     https://id.tagit.network/01/{GTIN}/21/{serial}?picc=<32 hex>&cmac=<16 hex>
+ *     → UID + counter are AES-encrypted inside `picc`; the app can't decrypt them
+ *       on-device, so verification is delegated to the server (see verifySunViaWeb).
+ *   PLAINTEXT UID (legacy / Demo Mode):
+ *     https://tagit.network/verify?uid=049F50...&ctr=000005&cmac=2446E5...&t=1
+ *     → UID/counter in the clear; verified via the tagit-services oracle endpoint.
  */
 export function parseSunUrl(rawUrl: string): SunData {
   const url = new URL(rawUrl);
   const params = url.searchParams;
 
-  const uid = params.get("uid") ?? params.get("picc_data") ?? "";
+  // `picc`/`picc_data` is the ENCRYPTED PICC mirror; `uid` is a plaintext UID.
+  const picc = params.get("picc") ?? params.get("picc_data") ?? "";
+  const uid = params.get("uid") ?? "";
   const ctr = params.get("ctr") ?? params.get("counter") ?? "";
   const cmac = params.get("cmac") ?? params.get("mac") ?? "";
 
-  // Token ID from ?t= param or from URL path segment
+  // Token ID from ?t= param or a numeric URL path segment (hint only; for GS1
+  // Digital Link the last segment is a serial, not a token id → stays 0 and the
+  // server resolves the real token from the decrypted UID).
   let tokenId = 0;
   const tParam = params.get("t") ?? params.get("tokenId") ?? params.get("token");
   if (tParam) {
     tokenId = parseInt(tParam, 10) || 0;
   } else {
-    // Try path: /verify/1 or /t/1
     const pathParts = url.pathname.split("/").filter(Boolean);
     const lastPart = pathParts[pathParts.length - 1];
     if (lastPart && /^\d+$/.test(lastPart)) {
@@ -72,10 +78,15 @@ export function parseSunUrl(rawUrl: string): SunData {
     }
   }
 
-  if (!uid) throw new Error("Missing UID in SUN URL");
   if (!cmac) throw new Error("Missing CMAC in SUN URL");
 
-  return { uid, ctr, cmac, tokenId, rawUrl };
+  if (picc) {
+    return { uid: "", picc, ctr, cmac, tokenId, rawUrl, format: "encrypted" };
+  }
+  if (uid) {
+    return { uid, picc: "", ctr, cmac, tokenId, rawUrl, format: "plaintext" };
+  }
+  throw new Error("SUN URL is missing both picc and uid");
 }
 
 /** Cancel any pending NFC scan request */

@@ -148,7 +148,7 @@ export function HomeScreen() {
           <Text style={styles.historyLink}>View History</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
-          Powered by ERC-8004 on Arbitrum Sepolia
+          Powered by ERC-8004 on Base Sepolia
         </Text>
       </View>
     </SafeAreaView>

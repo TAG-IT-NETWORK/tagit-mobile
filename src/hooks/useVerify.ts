@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNfcScan, type NfcStatus } from "./useNfcScan";
 import { buildVerifyRequest, verifyAsset, VerifyApiError } from "../services/api";
+import { verifySunViaWeb } from "../services/sunVerify";
 import { parseSunUrl } from "../services/nfc";
 import { generateChallenge, checkApiHealth } from "../services/challenge";
 import { addToHistory } from "../services/history";
@@ -76,28 +77,39 @@ export function useVerify(): UseVerifyResult {
     setChallenge(null);
 
     try {
-      // Phase 1: health check
-      setPhase("health-check");
-      const healthy = await checkApiHealth();
-      if (!healthy) throw new Error("Server unreachable — check your connection");
-
-      // Phase 2: generate challenge
+      // Phase 1: freshness nonce (local — no server needed)
       setPhase("challenging");
       const ch = await generateChallenge();
       setChallenge(ch);
 
-      // Phase 3: NFC scan
+      // Phase 2: NFC scan
       setPhase("scanning");
       const sun = await scan();
       setSunData(sun);
 
-      // Phase 4: verify
+      // Phase 3: verify — route by SUN format
+      if (sun.format === "encrypted") {
+        // Real NTAG 424 DNA chip: the PICC is AES-encrypted and we have no SDM
+        // key on-device, so verify server-side (verify.tagit.network).
+        setPhase("verifying");
+        const { response, uid } = await verifySunViaWeb(sun);
+        const sunResolved = { ...sun, uid };
+        setSunData(sunResolved);
+        setResult(response);
+        await addToHistory(buildScanRecord(response, ch, sunResolved));
+        setPhase("done");
+        return;
+      }
+
+      // Plaintext / Demo Mode: verify via the tagit-services oracle endpoint.
+      setPhase("health-check");
+      const healthy = await checkApiHealth();
+      if (!healthy) throw new Error("Server unreachable — check your connection");
+
       setPhase("verifying");
       const request = buildVerifyRequest(sun, tokenIdOverride, ch);
       const response = await verifyAsset(request);
       setResult(response);
-
-      // Phase 5: persist
       await addToHistory(buildScanRecord(response, ch, sun));
       setPhase("done");
     } catch (err) {
