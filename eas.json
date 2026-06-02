@@ -7,7 +7,12 @@
       "android": {
         "buildType": "apk"
       },
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
+        "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+      }
     },
     "development": {
       "developmentClient": true,
