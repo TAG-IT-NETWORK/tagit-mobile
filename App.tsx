@@ -2,7 +2,18 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { WagmiProvider } from "wagmi";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { RootNavigator } from "./src/navigation/RootNavigator";
+import {
+  WALLETCONNECT_AVAILABLE,
+  wagmiConfig,
+  queryClient,
+  appKit,
+  AppKit,
+  AppKitProvider,
+} from "./src/wallet/appkit";
+import { WalletSyncBridge } from "./src/wallet/WalletSyncBridge";
 import { colors } from "./src/theme/colors";
 
 const DarkTheme = {
@@ -48,14 +59,37 @@ class ErrorBoundary extends React.Component<
   }
 }
 
+function AppShell() {
+  return (
+    <ErrorBoundary>
+      <NavigationContainer theme={DarkTheme}>
+        <RootNavigator />
+      </NavigationContainer>
+    </ErrorBoundary>
+  );
+}
+
 export default function App() {
+  // External-wallet support (WalletConnect/AppKit) mounts only when a Reown
+  // projectId is configured; otherwise the app runs on the embedded wallet.
+  if (WALLETCONNECT_AVAILABLE && wagmiConfig && queryClient && appKit) {
+    return (
+      <SafeAreaProvider>
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <AppKitProvider instance={appKit}>
+              <WalletSyncBridge />
+              <AppShell />
+              <AppKit />
+            </AppKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </SafeAreaProvider>
+    );
+  }
   return (
     <SafeAreaProvider>
-      <ErrorBoundary>
-        <NavigationContainer theme={DarkTheme}>
-          <RootNavigator />
-        </NavigationContainer>
-      </ErrorBoundary>
+      <AppShell />
     </SafeAreaProvider>
   );
 }

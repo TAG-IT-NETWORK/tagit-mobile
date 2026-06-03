@@ -11,6 +11,7 @@ import { useCallback } from "react";
 import { useWalletStore } from "./store";
 import { createEmbeddedWallet, loadEmbeddedWallet, clearEmbeddedWallet } from "./embedded";
 import { connectExternalWallet, WALLETCONNECT_AVAILABLE } from "./walletconnect";
+import { requestDisconnect } from "./appkit";
 
 export function useWallet() {
   const state = useWalletStore();
@@ -50,8 +51,17 @@ export function useWallet() {
     }
   }, []);
 
-  /** Remove the embedded wallet from the device and reset session. */
+  /** Disconnect an external wallet, or remove the embedded one from the device. */
   const forget = useCallback(async () => {
+    if (useWalletStore.getState().mode === "connected") {
+      // External wallet: end the wagmi session; WalletSyncBridge resets the store.
+      try {
+        await requestDisconnect();
+      } catch {
+        useWalletStore.getState().disconnect();
+      }
+      return;
+    }
     await clearEmbeddedWallet();
     useWalletStore.getState().disconnect();
   }, []);

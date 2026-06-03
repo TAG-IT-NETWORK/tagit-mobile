@@ -75,13 +75,20 @@ export function SettingsScreen() {
   const { activeAddress, mode, forget } = useWallet();
   const { clear: clearHistory } = useHistory();
 
+  const isConnected = mode === "connected";
   const confirmForget = () =>
     Alert.alert(
-      "Forget wallet?",
-      "This removes the on-device wallet key. If you haven't backed it up, any assets it holds become unrecoverable.",
+      isConnected ? "Disconnect wallet?" : "Forget wallet?",
+      isConnected
+        ? "This disconnects your external wallet from TAG IT. You can reconnect anytime."
+        : "This removes the on-device wallet key. If you haven't backed it up, any assets it holds become unrecoverable.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Forget", style: "destructive", onPress: () => void forget() },
+        {
+          text: isConnected ? "Disconnect" : "Forget",
+          style: "destructive",
+          onPress: () => void forget(),
+        },
       ],
     );
 
@@ -105,7 +112,12 @@ export function SettingsScreen() {
             <Row icon="information-circle-outline" label="Type" value={mode === "connected" ? "Connected" : "On-device"} />
           )}
           {activeAddress && (
-            <Row icon="trash-outline" label="Forget wallet" destructive onPress={confirmForget} />
+            <Row
+              icon={isConnected ? "log-out-outline" : "trash-outline"}
+              label={isConnected ? "Disconnect wallet" : "Forget wallet"}
+              destructive
+              onPress={confirmForget}
+            />
           )}
         </Section>
 
