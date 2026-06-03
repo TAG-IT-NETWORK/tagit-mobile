@@ -35,7 +35,8 @@
         {
           "nfcPermission": "TAG IT needs NFC to scan TAG IT chips",
           "selectIdentifiers": [],
-          "systemCodes": []
+          "systemCodes": [],
+          "includeNdefEntitlement": false
         }
       ],
       "expo-secure-store"
