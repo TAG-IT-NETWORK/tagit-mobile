@@ -45,9 +45,11 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "info@tagit.network",
-        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "REPLACE_WITH_10CHAR_TEAM_ID"
+        "ascAppId": "6776354727",
+        "appleTeamId": "G65M6YDQN2",
+        "ascApiKeyPath": "/Users/artem/.tagit/AuthKey_JJAMJ74BW7.p8",
+        "ascApiKeyId": "JJAMJ74BW7",
+        "ascApiKeyIssuerId": "ff358288-fe0e-4bcb-b828-b6191814fc52"
       }
     }
   }
