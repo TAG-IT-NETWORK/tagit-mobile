@@ -15,6 +15,7 @@ export type RootStackParamList = {
     challenge: Challenge | null;
   };
   History: undefined;
+  Settings: undefined;
 };
 
 export type TapStackParamList = RootStackParamList;

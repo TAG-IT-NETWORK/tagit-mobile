@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ORACULAR",
+    "name": "TAG IT",
     "slug": "tagit-mobile",
     "scheme": "oracular",
     "version": "0.1.0",
@@ -16,7 +16,7 @@
       "bundleIdentifier": "network.tagit.oracular",
       "supportsTablet": false,
       "infoPlist": {
-        "NFCReaderUsageDescription": "ORACULAR uses NFC to verify the authenticity of your TAG IT–chipped items.",
+        "NFCReaderUsageDescription": "TAG IT uses NFC to verify the authenticity of your TAG IT–chipped items.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -33,7 +33,7 @@
       [
         "react-native-nfc-manager",
         {
-          "nfcPermission": "ORACULAR needs NFC to scan TAG IT chips",
+          "nfcPermission": "TAG IT needs NFC to scan TAG IT chips",
           "selectIdentifiers": [],
           "systemCodes": []
         }

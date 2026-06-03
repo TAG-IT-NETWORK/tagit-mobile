@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useHistory } from "../hooks/useHistory";
@@ -42,6 +43,16 @@ function ScanRow({ item }: { item: ScanRecord }) {
 export function HistoryScreen() {
   const { records, loading, refresh, clear } = useHistory();
 
+  const confirmClear = () =>
+    Alert.alert(
+      "Clear scan history?",
+      "This permanently deletes all saved scans on this device.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Clear", style: "destructive", onPress: () => void clear() },
+      ],
+    );
+
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       {records.length === 0 && !loading ? (
@@ -71,7 +82,7 @@ export function HistoryScreen() {
       {records.length > 0 && (
         <TouchableOpacity
           style={styles.clearBtn}
-          onPress={clear}
+          onPress={confirmClear}
           activeOpacity={0.7}
         >
           <Text style={styles.clearText}>Clear History</Text>

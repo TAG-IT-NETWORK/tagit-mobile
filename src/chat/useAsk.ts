@@ -32,7 +32,10 @@ export function useAsk(assetContext?: AskAssetContext) {
         onDone: () => useChatStore.getState().setStreaming(false),
         onError: (message) => {
           const s = useChatStore.getState();
-          s.appendToLast(s.messages[s.messages.length - 1]?.content ? "" : `⚠️ ${message}`);
+          // Show the error whether or not partial text already streamed: append on
+          // a new line if there's content, otherwise replace the empty bubble.
+          const hasText = !!s.messages[s.messages.length - 1]?.content;
+          s.appendToLast(hasText ? `\n\n⚠️ ${message}` : `⚠️ ${message}`);
           s.setStreaming(false);
         },
       });

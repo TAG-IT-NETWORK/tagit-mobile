@@ -7,10 +7,12 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { ScanButton } from "../components/ScanButton";
 import { ErrorBanner } from "../components/ErrorBanner";
@@ -75,10 +77,27 @@ export function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
 
+      {/* Settings gear */}
+      <TouchableOpacity
+        style={styles.settingsBtn}
+        onPress={() => nav.navigate("Settings")}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel="Settings"
+      >
+        <Ionicons name="settings-outline" size={22} color={colors.textSecondary} />
+      </TouchableOpacity>
+
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>ORACULAR</Text>
-        <Text style={styles.subtitle}>TAG IT NFC Verification</Text>
+        <Image
+          source={require("../../assets/icon.png")}
+          style={styles.logoMark}
+          resizeMode="contain"
+          accessibilityLabel="TAG IT logo"
+        />
+        <Text style={styles.logo}>TAG IT</Text>
+        <Text style={styles.subtitle}>NFC Verification</Text>
       </View>
 
       {/* Scan Button */}
@@ -128,7 +147,7 @@ export function HomeScreen() {
         <View>
           <Text style={styles.toggleLabel}>Demo Mode</Text>
           <Text style={styles.toggleDesc}>
-            Bypass NFC with hardcoded payload
+            Verify a sample item without a chip
           </Text>
         </View>
         <Switch
@@ -147,9 +166,10 @@ export function HomeScreen() {
         >
           <Text style={styles.historyLink}>View History</Text>
         </TouchableOpacity>
-        <Text style={styles.footerText}>
-          Powered by ERC-8004 on Base Sepolia
-        </Text>
+        <View style={styles.netBadge}>
+          <View style={styles.netDot} />
+          <Text style={styles.netBadgeText}>Base Sepolia · Testnet</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -165,6 +185,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: spacing.xl,
     paddingBottom: spacing.md,
+  },
+  logoMark: {
+    width: 60,
+    height: 60,
+    borderRadius: 15,
+    marginBottom: spacing.sm,
+  },
+  settingsBtn: {
+    position: "absolute",
+    top: spacing.xl,
+    right: 0,
+    zIndex: 10,
+    padding: spacing.xs,
   },
   logo: {
     fontSize: fontSize.hero,
@@ -238,6 +271,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: spacing.md,
     gap: spacing.sm,
+  },
+  netBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  netDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.warning,
+  },
+  netBadgeText: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
   historyLink: {
     fontSize: fontSize.sm,
