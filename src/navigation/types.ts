@@ -31,6 +31,12 @@ export type AskStackParamList = {
   Chat: { assetTokenId?: string } | undefined;
 };
 
+/** Agents tab stack — read-only directory of TAG IT's network agents. */
+export type AgentsStackParamList = {
+  AgentsList: undefined;
+  AgentDetail: { agent: import("../agents/types").AgentSummary };
+};
+
 /** Bottom-tab navigator. */
 export type RootTabParamList = {
   Vault: undefined;

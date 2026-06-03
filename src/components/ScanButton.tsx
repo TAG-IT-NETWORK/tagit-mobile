@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Animated,
   Easing,
-  View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/colors";
 import { fontSize, radius } from "../theme/spacing";
 import type { VerifyPhase } from "../hooks/useVerify";
@@ -97,14 +97,14 @@ export function ScanButton({ phase, onPress, disabled }: ScanButtonProps) {
       >
         {phase === "health-check" || phase === "challenging" || phase === "verifying" ? (
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
-            <Text style={styles.icon}>{"◎"}</Text>
+            <Ionicons name="sync-outline" size={64} color={colors.warning} />
           </Animated.View>
         ) : (
-          <View>
-            <Text style={styles.icon}>
-              {phase === "scanning" ? "📡" : "⬡"}
-            </Text>
-          </View>
+          <Ionicons
+            name={phase === "scanning" ? "radio-outline" : "scan-outline"}
+            size={64}
+            color={phase === "scanning" ? colors.warning : colors.primary}
+          />
         )}
         <Text style={[styles.label, isActive && styles.labelActive]}>
           {label}

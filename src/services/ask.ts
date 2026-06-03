@@ -43,6 +43,10 @@ export function streamAsk(
     body: JSON.stringify({ messages, assetContext }),
     // We manage the connection lifecycle; no auto-reconnect polling.
     pollingInterval: 0,
+    // Fail cleanly instead of hanging forever if the server stops streaming
+    // (default is 0 = no timeout). Generous enough for a slow LLM turn.
+    timeout: 60000,
+    timeoutBeforeConnection: 0,
   });
 
   const close = () => es.close();

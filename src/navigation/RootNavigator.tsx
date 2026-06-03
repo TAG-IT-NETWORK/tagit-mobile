@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TapStackNavigator } from "./TapStackNavigator";
 import { VaultStackNavigator } from "./VaultStackNavigator";
 import { AskStackNavigator } from "./AskStackNavigator";
+import { AgentsStackNavigator } from "./AgentsStackNavigator";
 import { PlaceholderScreen } from "../screens/PlaceholderScreen";
 import { TabBarTapButton } from "../components/TabBarTapButton";
 import { colors } from "../theme/colors";
@@ -13,10 +14,6 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function MarketScreen() {
   return <PlaceholderScreen title="Marketplace" subtitle="Verified trade — coming soon" icon="storefront-outline" />;
-}
-
-function AgentsScreen() {
-  return <PlaceholderScreen title="Agents" subtitle="Deploy AI agents — coming soon" icon="hardware-chip-outline" />;
 }
 
 /**
@@ -74,7 +71,7 @@ export function RootNavigator() {
       />
       <Tab.Screen
         name="Agents"
-        component={AgentsScreen}
+        component={AgentsStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="hardware-chip-outline" size={size} color={color} />

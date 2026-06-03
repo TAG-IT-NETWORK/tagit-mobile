@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
 
@@ -10,12 +11,15 @@ interface StatusIndicatorProps {
 export function StatusIndicator({ verified }: StatusIndicatorProps) {
   const color = verified ? colors.verified : colors.unverified;
   const bgColor = verified ? colors.successDim : colors.errorDim;
-  const icon = verified ? "✓" : "✗";
   const label = verified ? "VERIFIED" : "UNVERIFIED";
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor, borderColor: color }]}>
-      <Text style={[styles.icon, { color }]}>{icon}</Text>
+    <View
+      style={[styles.container, { backgroundColor: bgColor, borderColor: color }]}
+      accessibilityRole="image"
+      accessibilityLabel={label}
+    >
+      <Ionicons name={verified ? "checkmark-circle" : "close-circle"} size={28} color={color} />
       <Text style={[styles.label, { color }]}>{label}</Text>
     </View>
   );
