@@ -16,7 +16,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
         "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
-        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network",
+        "EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID": "502d11f2906278da58ed7808e56b81ff"
       }
     },
     "development": {
@@ -29,7 +30,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
         "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
-        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network",
+        "EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID": "502d11f2906278da58ed7808e56b81ff"
       }
     },
     "production": {
@@ -41,7 +43,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
         "EXPO_PUBLIC_API_KEY": "tagit-hack-2026-key",
-        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network"
+        "EXPO_PUBLIC_VERIFIER_URL": "https://verify.tagit.network",
+        "EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID": "502d11f2906278da58ed7808e56b81ff"
       }
     }
   },
