@@ -59,21 +59,36 @@ const metadata = {
 let wagmiConfig: Config | null = null;
 let appKit: ReturnType<typeof createAppKit> | null = null;
 let queryClient: QueryClient | null = null;
+let initError: string | null = null;
 
 if (WALLETCONNECT_AVAILABLE) {
-  const networks = [baseSepolia] as const;
-  const adapter = new WagmiAdapter({ networks, projectId: WC_PROJECT_ID });
-  appKit = createAppKit({
-    projectId: WC_PROJECT_ID,
-    metadata,
-    adapters: [adapter],
-    storage: wcStorage,
-    // AppKit's Network[] and viem's Chain are structurally the same here.
-    networks: [baseSepolia] as never,
-  });
-  wagmiConfig = adapter.wagmiConfig;
-  queryClient = new QueryClient();
+  // NEVER let a WalletConnect init failure crash app launch — degrade to the
+  // embedded-wallet path and surface the reason (see Settings).
+  try {
+    const networks = [baseSepolia] as const;
+    const adapter = new WagmiAdapter({ networks, projectId: WC_PROJECT_ID });
+    appKit = createAppKit({
+      projectId: WC_PROJECT_ID,
+      metadata,
+      adapters: [adapter],
+      storage: wcStorage,
+      // AppKit's Network[] and viem's Chain are structurally the same here.
+      networks: [baseSepolia] as never,
+    });
+    wagmiConfig = adapter.wagmiConfig;
+    queryClient = new QueryClient();
+  } catch (e) {
+    initError = e instanceof Error ? e.message : String(e);
+    wagmiConfig = null;
+    appKit = null;
+    queryClient = null;
+    // eslint-disable-next-line no-console
+    console.warn("[walletconnect] AppKit init failed; external wallet disabled:", e);
+  }
 }
+
+/** Non-null when WalletConnect was configured but failed to initialize. */
+export const WC_INIT_ERROR = initError;
 
 export { wagmiConfig, appKit, queryClient, AppKit, AppKitProvider };
 

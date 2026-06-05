@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 import { useWallet } from "../wallet/useWallet";
 import { useHistory } from "../hooks/useHistory";
 import { API_URL, VERIFIER_URL } from "../config/env";
+import { WALLETCONNECT_AVAILABLE, WC_INIT_ERROR } from "../wallet/appkit";
 import { BASE_SEPOLIA_CHAIN_ID } from "../onchain/addresses";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
@@ -135,6 +136,17 @@ export function SettingsScreen() {
           <Row first icon="pricetag-outline" label="App" value="TAG IT" />
           <Row icon="cube-outline" label="Version" value={appVersion} />
           <Row icon="globe-outline" label="Verification" value="ERC-8004" />
+          <Row
+            icon="wallet-outline"
+            label="WalletConnect"
+            value={
+              !WALLETCONNECT_AVAILABLE
+                ? "Off"
+                : WC_INIT_ERROR
+                  ? `Err: ${WC_INIT_ERROR.slice(0, 40)}`
+                  : "Ready"
+            }
+          />
         </Section>
 
         <Text style={styles.tagline}>TAG IT — verify what&apos;s real.</Text>
