@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "TAG IT",
+    "slug": "tagit-mobile",
+    "scheme": "oracular",
+    "version": "0.1.0",
+    "newArchEnabled": false,
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0A0A",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#0A0A0A"
+    },
+    "ios": {
+      "bundleIdentifier": "network.tagit.oracular",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NFCReaderUsageDescription": "TAG IT uses NFC to verify the authenticity of your TAG IT–chipped items.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0A"
+      },
+      "package": "network.tagit.oracular",
+      "permissions": [
+        "android.permission.NFC"
+      ]
+    },
+    "plugins": [
+      [
+        "react-native-nfc-manager",
+        {
+          "nfcPermission": "TAG IT needs NFC to scan TAG IT chips",
+          "selectIdentifiers": [],
+          "systemCodes": []
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d94951b3-09c7-46d1-85ad-d70e7fe2959e"
+      }
+    }
+  }
+}
