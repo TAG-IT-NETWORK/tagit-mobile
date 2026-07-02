@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # --ignore-workspace matters for local parity: the tagit monorepo's pnpm
+      # workspace otherwise overrides this app's .npmrc node-linker=hoisted.
+      - run: pnpm install --ignore-workspace --frozen-lockfile
+
+      - run: npx tsc --noEmit
+
+      - run: npx jest --silent
