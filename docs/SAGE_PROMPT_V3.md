@@ -109,9 +109,12 @@ just its code, and confirm the local checkout is at `origin/main` before editing
   creating the ASC app record AFTER the conversion completes if timing allows.
 - **B — Ships as "TAG IT":** ✅ DONE — name ✓; bundle id `network.tagit.app`
   applied to app.json 2026-07-02 (Artem's call).
-- **C — Transfer = ERC-721 `safeTransferFrom` of a CLAIMED token:** VALID — and now
-  **the core build item** (see MVP). Owner changes, state stays CLAIMED; distinct
-  from `claim()` (ACTIVATED→CLAIMED).
+- **C — Transfer of a CLAIMED token:** VALID in substance, **mechanism corrected
+  2026-07-02**: TAGITCore's `_update()` override reverts ALL external ERC-721
+  transfers (`TransferDisabled`) — `safeTransferFrom` is impossible. The sanctioned
+  path is **`transferAsset(tokenId, to)`** (PR #31): owner-gated, CLAIMED-only
+  (contract-enforced), verified live in the deployed implementation (`fa62ee8d` @
+  `0xa7f3…a78d`). Still the core build item; still distinct from `claim()`.
 - **D — Flag/Mark-stolen DEFERRED from July-31 MVP:** VALID. `flag()` is
   capability-gated with no ownership check → consumer badge = false-flag DoS. The
   owner-gated `flagOwn` needs a tagit-contracts change + SEC review. Post-demo.
