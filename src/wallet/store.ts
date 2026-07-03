@@ -27,6 +27,13 @@ export interface WalletState {
   emailVerified: boolean;
   /** Becomes the active address used for Vault queries etc. */
   activeAddress: Address | null;
+  /**
+   * True once a launch-time restore() has completed without error (wallet found
+   * or confirmed absent). Onboarding must never render before this is true —
+   * offering "Create my wallet" while restore is pending or failed is the
+   * key-overwrite race (SEC_TRANSFER_STRIDE.md precondition 1).
+   */
+  restored: boolean;
   status: "idle" | "connecting" | "ready" | "error";
   error: string | null;
 }
@@ -37,6 +44,7 @@ export interface WalletActions {
   setSmartAccount: (addr: Address, deployed: boolean) => void;
   setEmailVerified: (v: boolean) => void;
   setStatus: (s: WalletState["status"], error?: string | null) => void;
+  setRestored: () => void;
   disconnect: () => void;
 }
 
@@ -47,6 +55,7 @@ const initialState: WalletState = {
   isAADeployed: false,
   emailVerified: false,
   activeAddress: null,
+  restored: false,
   status: "idle",
   error: null,
 };
@@ -86,5 +95,9 @@ export const useWalletStore = create<WalletState & WalletActions>((set) => ({
 
   setStatus: (status, error = null) => set({ status, error }),
 
-  disconnect: () => set({ ...initialState }),
+  setRestored: () => set({ restored: true }),
+
+  // Keep restored=true: after a deliberate forget/disconnect there is no
+  // pending restore, and onboarding should render immediately.
+  disconnect: () => set({ ...initialState, restored: true }),
 }));

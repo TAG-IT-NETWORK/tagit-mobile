@@ -110,9 +110,12 @@ a CI grep-gate **on the accessor's import sites** (not the string "privateKey").
 ## Hard preconditions (blocking; = wallet-hardening task `3914…9087`, revised scope)
 1. **Key-overwrite race fixed** (onboarding can destroy an existing key today).
 2. **OS-enforced key access**: re-store the key with `requireAuthentication: true`
-   (one-time migration of the existing item), add `NSFaceIDUsageDescription` +
-   `expo-local-authentication` (UX prompt/fallback) to app.json/deps **before the
-   first iOS dev build** so it can be device-verified.
+   (one-time migration of the existing item; device support detected via
+   `SecureStore.canUseBiometricAuthentication()`). `NSFaceIDUsageDescription` is
+   injected via expo-secure-store's own `faceIDPermission` plugin option — no
+   extra native dependency (`expo-local-authentication` stays out of v1: OS-level
+   gating comes from SecureStore itself, and a JS-layer prompt adds no security).
+   Must be in app.json **before the first iOS dev build** for device verification.
 3. `restore()` failure → retry path, never a create path that can overwrite.
 4. Key-boundary refactor (address-only public API) + CI accessor grep-gate.
 5. Mobile ABI: add `transferAsset` + `AssetResold`; decode-test `getAsset` field order.
@@ -124,6 +127,22 @@ transfer via deep link · mainnet config · truncated addresses on the Confirm s
 ## Residual risks (accepted for the July-31 TESTNET demo — revisit before real users)
 1. **No key backup/export** — device loss = asset loss. Testnet-only acceptance;
    hard blocker before real assets (post-demo, ROADMAP C; AA email-recovery path).
+1b. **Biometric re-enrollment invalidates the gated key** (iOS `biometryCurrentSet`,
+   Android `invalidatedByBiometricEnrollment` — both hardcoded in expo-secure-store;
+   no "biometryAny" option). Adding a fingerprint / re-enrolling Face ID kills the
+   key; it then READS AS NULL while the ungated address survives. Detected and
+   surfaced distinctly (`KeyInvalidatedError`, never "no wallet"). Same acceptance
+   and same fix path as risk 1: backup/export or AA owner-rotation MUST land
+   before real assets — explicitly BEFORE auth-gating runs on real users' keys.
+1c. **Ungated-key populations**: legacy pre-hardening keys are NOT retroactively
+   auth-gated (a silent launch-time migration prompts users without context and
+   can lock out old binaries — rejected by review); devices without class-3
+   biometrics, and users who cancel the creation prompt, also store ungated. On
+   these, the import fence + module privacy are the only key-access layers.
+   Dev/testnet population today; acceptable. Note: the gated-write path requires
+   the NSFaceIDUsageDescription plist (expo-secure-store `faceIDPermission`) in
+   the BUILT binary — this JS is coupled to a native rebuild, never OTA it onto
+   older binaries.
 2. Same-process malicious dependency can bypass all JS-layer controls (see posture);
    OS biometric at key retrieval is the surviving control. Durable fix post-v1.
 3. Unlocked-phone attacker within a biometric session — standard mobile-wallet posture.
@@ -147,4 +166,5 @@ transfer via deep link · mainnet config · truncated addresses on the Confirm s
 - [ ] E2E: provenance timeline shows the transfer after confirmation
 
 ## Approval
-- [ ] **APPROVED — Artem** (date: ______)  /  [ ] CHANGES REQUESTED: ______________
+- [x] **APPROVED — Artem** (date: 2026-07-03, recorded in session + Notion task
+      `3914…7fc2`)  /  [ ] CHANGES REQUESTED: ______________

@@ -17,11 +17,17 @@ interface Props {
  */
 export function OnboardingScreen({ onCreateEmbedded, onConnectExternal }: Props) {
   const [busy, setBusy] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const handleCreate = async () => {
     setBusy(true);
+    setCreateError(null);
     try {
       await onCreateEmbedded();
+    } catch (e) {
+      // Rendered inline — a rejection here (keystore failure, cancelled
+      // biometric prompt) must not vanish as an unhandled rejection.
+      setCreateError(e instanceof Error ? e.message : "Could not create the wallet");
     } finally {
       setBusy(false);
     }
@@ -50,6 +56,8 @@ export function OnboardingScreen({ onCreateEmbedded, onConnectExternal }: Props)
           </>
         )}
       </Pressable>
+
+      {createError && <Text style={styles.errorText}>{createError}</Text>}
 
       <Pressable
         onPress={onConnectExternal}
@@ -117,6 +125,12 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   secondaryText: { color: colors.textSecondary, fontSize: fontSize.md, fontWeight: "600" },
+  errorText: {
+    color: colors.error,
+    fontSize: fontSize.sm,
+    textAlign: "center",
+    marginTop: spacing.md,
+  },
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.85 },
 });

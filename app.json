@@ -38,7 +38,12 @@
           "systemCodes": []
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "TAG IT uses Face ID to authorize transactions from your wallet."
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -9,20 +9,25 @@
  */
 import { useCallback } from "react";
 import { useWalletStore } from "./store";
-import { createEmbeddedWallet, loadEmbeddedWallet, clearEmbeddedWallet } from "./embedded";
+import { loadOrCreateEmbeddedWallet, loadEmbeddedWallet, clearEmbeddedWallet } from "./embedded";
 import { connectExternalWallet, WALLETCONNECT_AVAILABLE } from "./walletconnect";
 
 export function useWallet() {
   const state = useWalletStore();
 
-  /** Create a fresh on-device wallet (first-run onboarding). */
+  /**
+   * Create the on-device wallet (first-run onboarding). Uses loadOrCreate so a
+   * stray tap can never overwrite an existing key — if one exists it is simply
+   * restored (SEC_TRANSFER_STRIDE.md precondition 1).
+   */
   const createEmbedded = useCallback(async () => {
-    const { setStatus, setEmbedded } = useWalletStore.getState();
+    const { setStatus, setEmbedded, setRestored } = useWalletStore.getState();
     setStatus("connecting");
     try {
-      const w = await createEmbeddedWallet();
+      const w = await loadOrCreateEmbeddedWallet();
       // Smart-account address is derived/deployed later (Phase 4); null for now.
       setEmbedded(w.address, null);
+      setRestored();
       return w.address;
     } catch (e) {
       setStatus("error", e instanceof Error ? e.message : "Failed to create wallet");
@@ -30,12 +35,26 @@ export function useWallet() {
     }
   }, []);
 
-  /** Restore a previously-created embedded wallet on app launch. */
+  /**
+   * Restore a previously-created embedded wallet on app launch. Marks the store
+   * `restored` only on a clean result (found or confirmed absent) — a keystore
+   * read failure leaves restored=false with status "error" so the UI offers
+   * retry instead of onboarding (which could overwrite the key).
+   */
   const restore = useCallback(async () => {
-    const { setEmbedded } = useWalletStore.getState();
-    const w = await loadEmbeddedWallet();
-    if (w) setEmbedded(w.address, null);
-    return w?.address ?? null;
+    const { setEmbedded, setRestored, setStatus } = useWalletStore.getState();
+    try {
+      const w = await loadEmbeddedWallet();
+      // Clear any stale error from a previously-failed attempt before marking
+      // the restore complete; setEmbedded sets "ready" when a wallet exists.
+      if (w) setEmbedded(w.address, null);
+      else setStatus("idle");
+      setRestored();
+      return w?.address ?? null;
+    } catch (e) {
+      setStatus("error", e instanceof Error ? e.message : "Could not read the device keystore");
+      return null;
+    }
   }, []);
 
   /** Connect a bring-your-own wallet via WalletConnect (when configured). */
@@ -61,6 +80,7 @@ export function useWallet() {
     eoaAddress: state.eoaAddress,
     smartAccountAddress: state.smartAccountAddress,
     activeAddress: state.activeAddress,
+    restored: state.restored,
     isAADeployed: state.isAADeployed,
     emailVerified: state.emailVerified,
     status: state.status,

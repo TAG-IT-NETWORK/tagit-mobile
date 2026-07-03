@@ -21,12 +21,17 @@ import type { VaultStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<VaultStackParamList, "VaultList">;
 
 export function VaultListScreen({ navigation }: Props) {
-  const { activeAddress, createEmbedded, connect, walletConnectAvailable, restore } = useWallet();
+  const { activeAddress, createEmbedded, connect, walletConnectAvailable, restore, restored, status, error: walletError } =
+    useWallet();
 
-  // Restore a previously-created wallet on first mount.
+  // Restore a previously-created wallet on first mount (once per mount; the
+  // Vault tab stays mounted for the app's lifetime under the bottom-tab
+  // navigator). A failed restore keeps restored=false and surfaces retry —
+  // it must NOT fall through to onboarding (key-overwrite race, SEC model).
   useEffect(() => {
-    if (!activeAddress) void restore();
-  }, [activeAddress, restore]);
+    if (!restored && status !== "connecting") void restore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Keep the active wallet visible in the header.
   useEffect(() => {
@@ -40,6 +45,27 @@ export function VaultListScreen({ navigation }: Props) {
   const { assets, loading, error, refresh } = useOwnedAssets(queryAddress);
 
   if (!activeAddress && !DEV_OWNER) {
+    // Keystore read failed: offer retry, never onboarding — "Create my wallet"
+    // over an unread existing key would overwrite it permanently.
+    if (!restored && status === "error") {
+      return (
+        <View style={styles.center}>
+          <Text style={styles.error}>{walletError ?? "Could not read the device keystore."}</Text>
+          <Text style={styles.hint} onPress={() => void restore()}>
+            Tap to retry
+          </Text>
+        </View>
+      );
+    }
+    // Restore still in flight: hold on a spinner until we know whether a
+    // wallet exists.
+    if (!restored) {
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator color={colors.primary} />
+        </View>
+      );
+    }
     return (
       <OnboardingScreen
         onCreateEmbedded={createEmbedded}

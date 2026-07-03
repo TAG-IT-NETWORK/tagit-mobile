@@ -28,3 +28,16 @@ jobs:
       - run: npx tsc --noEmit
 
       - run: npx jest --silent
+
+      # Custody import fence (SEC_TRANSFER_STRIDE.md): the raw-key accessor —
+      # and the expo-secure-store surface it guards — may only be referenced
+      # inside src/wallet/.
+      - name: Custody import fence
+        run: |
+          hits=$(grep -rlnE "getSigningKey|secureKeyStore|expo-secure-store" . \
+            --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
+            --exclude-dir=node_modules --exclude-dir=.git 2>/dev/null \
+            | grep -vE '^(\./)?src/wallet/' || true)
+          if [ -n "$hits" ]; then
+            echo "Custody surface referenced outside src/wallet/:"; echo "$hits"; exit 1
+          fi
