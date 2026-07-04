@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════
+# CI — typecheck + jest
+#
+# Runs on every pull request and on pushes to main.
+# Provides the CI signal that ci-failure-to-notion.yml listens for
+# (that workflow was previously inert because no other workflows existed).
+#
+# Why --ignore-workspace:
+#   tagit-mobile lives inside a pnpm monorepo. A plain `pnpm install`
+#   would be governed by the root workspace config, which overrides
+#   node-linker=hoisted from the local .npmrc. React Native autolinking
+#   requires hoisted modules, so we must bypass the workspace with
+#   --ignore-workspace to keep the local .npmrc settings in effect.
+# ═══════════════════════════════════════════════════════════════
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Typecheck and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies (hoisted, ignore workspace)
+        run: pnpm install --ignore-workspace
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npx jest
