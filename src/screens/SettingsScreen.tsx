@@ -105,6 +105,14 @@ export function SettingsScreen() {
             <Row icon="information-circle-outline" label="Type" value={mode === "connected" ? "Connected" : "On-device"} />
           )}
           {activeAddress && (
+            <View style={[styles.row, styles.rowBorder, styles.addressBlock]}>
+              <Text style={styles.addressHint}>Full address — hold to copy</Text>
+              <Text style={styles.fullAddress} selectable>
+                {activeAddress}
+              </Text>
+            </View>
+          )}
+          {activeAddress && (
             <Row icon="trash-outline" label="Forget wallet" destructive onPress={confirmForget} />
           )}
         </Section>
@@ -158,6 +166,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   rowBorder: { borderTopWidth: 1, borderTopColor: colors.border },
+  addressBlock: { flexDirection: "column", alignItems: "flex-start", gap: spacing.xs },
+  addressHint: { fontSize: fontSize.xs, color: colors.textMuted },
+  fullAddress: { fontSize: fontSize.sm, color: colors.text, fontFamily: "monospace" },
   rowLabel: { flex: 1, fontSize: fontSize.md, color: colors.text },
   rowRight: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
   rowValue: { fontSize: fontSize.sm, color: colors.textSecondary, fontFamily: "monospace" },
