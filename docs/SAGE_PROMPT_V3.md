@@ -77,9 +77,11 @@ just its code, and confirm the local checkout is at `origin/main` before editing
   theme, HomeScreen StatusBar. Design target: Coinbase/ChatGPT minimal — white
   `#FFFFFF`, near-black text, black primary buttons, ≤1 accent, 8pt grid.
 - **Naming:** `app.json` name is **"TAG IT"**; bundle id / android package =
-  **`network.tagit.app`** (decided by Artem + applied 2026-07-02). This locks
-  PERMANENTLY at the first ASC / Play upload — do not change it again. (Deep-link
-  `scheme` is still `"oracular"` — cosmetic, safe to change anytime pre-launch.)
+  **`network.tagit.oracular`** — REVERTED 2026-07-06 (Artem's call): EAS history
+  proved iOS builds 4/5/6 were already uploaded June 3 to ASC app **6776354727**
+  under the oracular id, so the 07-02 rename (premised on "no upload ever") would
+  have orphaned the installed TestFlight app. The id is now LOCKED by that upload.
+  (Deep-link `scheme` `"oracular"` — cosmetic.)
 - **iOS/release state:** eas.json has all three build profiles correctly shaped
   (remote versioning, autoIncrement, device builds); `submit.production.ios` has two
   placeholders (`ascAppId`, `appleTeamId`) — no ASC app record, no iOS build ever
@@ -107,8 +109,9 @@ just its code, and confirm the local checkout is at `origin/main` before editing
   "started 07-01" note was premature). D-U-N-S latency gates EXTERNAL review only;
   internal-tester TestFlight proceeds on the existing account meanwhile. Prefer
   creating the ASC app record AFTER the conversion completes if timing allows.
-- **B — Ships as "TAG IT":** ✅ DONE — name ✓; bundle id `network.tagit.app`
-  applied to app.json 2026-07-02 (Artem's call).
+- **B — Ships as "TAG IT":** ✅ DONE — name ✓; bundle id **`network.tagit.oracular`**
+  (2026-07-06 revert, Artem's call — locked by the June 3 TestFlight uploads to
+  ASC 6776354727; users never see it, branding is "TAG IT" everywhere).
 - **C — Transfer of a CLAIMED token:** VALID in substance, **mechanism corrected
   2026-07-02**: TAGITCore's `_update()` override reverts ALL external ERC-721
   transfers (`TransferDisabled`) — `safeTransferFrom` is impossible. The sanctioned
