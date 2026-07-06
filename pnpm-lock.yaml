@@ -42,8 +42,8 @@ importers:
         specifier: ~14.0.0
         version: 14.0.1(expo@52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1))
       expo-secure-store:
-        specifier: ~14.0.1
-        version: 14.0.1(expo@52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1))
+        specifier: ~14.2.4
+        version: 14.2.4(expo@52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1))
       expo-status-bar:
         specifier: ~2.0.0
         version: 2.0.1(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)
@@ -1119,7 +1119,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.28':
     resolution: {integrity: sha512-lvt72KNitGuixYD2l3SZmRKVu2G4zJpmg5V7WfUBNpmUU5oODBw/6qmiJ6kSLAlfDozscUk+BBGknBBzxUrwrA==}
@@ -2323,8 +2323,8 @@ packages:
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
-  enhanced-resolve@5.24.1:
-    resolution: {integrity: sha512-7DdUaTjmNwMcH2gLr1qycesKII3BK4RLy/mdAb7x10Lq7bR4aNKHt1BR1ZALSv0rPM/hF5wYF0PhGop/rJm8vw==}
+  enhanced-resolve@5.24.2:
+    resolution: {integrity: sha512-rpsZEGT1jFuve6QlpyRp9ckQ+kN61hvF9BzCPyMdaKTm8UJce96KBn3sorXOFXlzjPrs3Vc4T1NsSroZ3PxlFw==}
     engines: {node: '>=10.13.0'}
 
   entities@6.0.1:
@@ -2520,8 +2520,8 @@ packages:
   expo-modules-core@2.2.3:
     resolution: {integrity: sha512-01QqZzpP/wWlxnNly4G06MsOBUTbMDj02DQigZoXfDh80vd/rk3/uVXqnZgOdLSggTs6DnvOgAUy0H2q30XdUg==}
 
-  expo-secure-store@14.0.1:
-    resolution: {integrity: sha512-QUS+j4+UG4jRQalgnpmTvvrFnMVLqPiUZRzYPnG3+JrZ5kwVW2w6YS3WWerPoR7C6g3y/a2htRxRSylsDs+TaQ==}
+  expo-secure-store@14.2.4:
+    resolution: {integrity: sha512-ePaz4fnTitJJZjAiybaVYGfLWWyaEtepZC+vs9ZBMhQMfG5HUotIcVsDaSo3FnwpHmgwsLVPY2qFeryI6AtULw==}
     peerDependencies:
       expo: '*'
 
@@ -3267,28 +3267,24 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-arm64-musl@1.27.0:
     resolution: {integrity: sha512-rCGBm2ax7kQ9pBSeITfCW9XSVF69VX+fm5DIpvDZQl4NnQoMQyRwhZQm9pd59m8leZ1IesRqWk2v/DntMo26lg==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-linux-x64-gnu@1.27.0:
     resolution: {integrity: sha512-Dk/jovSI7qqhJDiUibvaikNKI2x6kWPN79AQiD/E/KeQWMjdGe9kw51RAgoWFDi0coP4jinaH14Nrt/J8z3U4A==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.27.0:
     resolution: {integrity: sha512-QKjTxXm8A9s6v9Tg3Fk0gscCQA1t/HMoF7Woy1u68wCk5kS4fR+q3vXa1p3++REW784cRAtkYKrPy6JKibrEZA==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-win32-arm64-msvc@1.27.0:
     resolution: {integrity: sha512-/wXegPS1hnhkeG4OXQKEMQeJd48RDC3qdh+OA8pCuOPCyvnm/yEayrJdJVqzBsqpy1aJklRCVxscpFur80o6iQ==}
@@ -4604,8 +4600,8 @@ packages:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
 
-  webpack-sources@3.5.0:
-    resolution: {integrity: sha512-HPuy+uuoTCaaoEoI1LQ3JN9+vrPBvEesnnX1jADHy728cHSMlq4wUc4afYqahq2B1mhQVZxCXOkNTnXltr+2vQ==}
+  webpack-sources@3.5.1:
+    resolution: {integrity: sha512-jyuiGJdtvY434z5bUZrjz67v76/ePNvFZTp9Mdz29IlH4+GPsgyGjiv0fKI+M7BdkU6ADjulUcKAd3tUK3WlEw==}
     engines: {node: '>=10.13.0'}
 
   webpack@5.107.2:
@@ -7724,7 +7720,7 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  enhanced-resolve@5.24.1:
+  enhanced-resolve@5.24.2:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -7944,7 +7940,7 @@ snapshots:
     dependencies:
       invariant: 2.2.4
 
-  expo-secure-store@14.0.1(expo@52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)):
+  expo-secure-store@14.2.4(expo@52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)):
     dependencies:
       expo: 52.0.49(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(react-native@0.76.9(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)
 
@@ -10319,7 +10315,7 @@ snapshots:
 
   webidl-conversions@7.0.0: {}
 
-  webpack-sources@3.5.0: {}
+  webpack-sources@3.5.1: {}
 
   webpack@5.107.2:
     dependencies:
@@ -10332,7 +10328,7 @@ snapshots:
       acorn-import-phases: 1.0.4(acorn@8.17.0)
       browserslist: 4.28.1
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.24.1
+      enhanced-resolve: 5.24.2
       es-module-lexer: 2.3.0
       eslint-scope: 5.1.1
       events: 3.3.0
@@ -10345,7 +10341,7 @@ snapshots:
       tapable: 2.3.3
       terser-webpack-plugin: 5.6.1(webpack@5.107.2)
       watchpack: 2.5.2
-      webpack-sources: 3.5.0
+      webpack-sources: 3.5.1
     transitivePeerDependencies:
       - '@minify-html/node'
       - '@swc/core'
