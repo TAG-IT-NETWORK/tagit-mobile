@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
@@ -72,16 +72,20 @@ export function HomeScreen() {
   }, [phase, demoMode, tokenIdOverride, cancel, startDemo, startScan]);
 
   const nfcUnavailable = nfcStatus === "unsupported" && !demoMode;
+  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
 
-      {/* Settings gear */}
+      {/* Settings gear — absolute children ignore SafeAreaView's inset padding,
+          so offset below the status bar explicitly; taps landing in the status
+          bar belong to the system (iOS scroll-to-top) and never reach the app. */}
       <TouchableOpacity
-        style={styles.settingsBtn}
+        style={[styles.settingsBtn, { top: insets.top + spacing.sm }]}
         onPress={() => nav.navigate("Settings")}
         activeOpacity={0.7}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         accessibilityRole="button"
         accessibilityLabel="Settings"
       >
@@ -194,8 +198,8 @@ const styles = StyleSheet.create({
   },
   settingsBtn: {
     position: "absolute",
-    top: spacing.xl,
-    right: 0,
+    // top is set inline from the runtime safe-area inset.
+    right: spacing.sm,
     zIndex: 10,
     padding: spacing.xs,
   },
