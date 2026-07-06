@@ -10,3 +10,25 @@ updates:
       - "dependencies"
     commit-message:
       prefix: "deps"
+    ignore:
+      # Expo-SDK-coupled packages: majors track the SDK; bump them only as
+      # part of a deliberate SDK upgrade, never via dependabot.
+      - dependency-name: "expo"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "expo-*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jest-expo"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-native"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/runtime"
+        update-types: ["version-update:semver-major"]
+      # Pinned to 2.51.3: 2.54.x tempo types deep-import ox/tempo/* and break
+      # strict tsc (8d20adf). Remove when ox packaging is fixed.
+      - dependency-name: "viem"
