@@ -13,7 +13,7 @@
       "backgroundColor": "#0A0A0A"
     },
     "ios": {
-      "bundleIdentifier": "network.tagit.app",
+      "bundleIdentifier": "network.tagit.oracular",
       "supportsTablet": false,
       "infoPlist": {
         "NFCReaderUsageDescription": "TAG IT uses NFC to verify the authenticity of your TAG IT–chipped items.",
@@ -24,7 +24,7 @@
       "adaptiveIcon": {
         "backgroundColor": "#0A0A0A"
       },
-      "package": "network.tagit.app",
+      "package": "network.tagit.oracular",
       "permissions": [
         "android.permission.NFC"
       ]
@@ -35,7 +35,8 @@
         {
           "nfcPermission": "TAG IT needs NFC to scan TAG IT chips",
           "selectIdentifiers": [],
-          "systemCodes": []
+          "systemCodes": [],
+          "includeNdefEntitlement": false
         }
       ],
       [

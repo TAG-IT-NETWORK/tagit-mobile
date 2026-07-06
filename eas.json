@@ -10,7 +10,8 @@
         "buildType": "apk"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
@@ -22,7 +23,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
@@ -33,7 +35,8 @@
     "production": {
       "autoIncrement": true,
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://tagit-services-31154571939.us-central1.run.app",
@@ -45,9 +48,11 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "info@tagit.network",
-        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "REPLACE_WITH_10CHAR_TEAM_ID"
+        "ascAppId": "6776354727",
+        "appleTeamId": "G65M6YDQN2",
+        "ascApiKeyPath": "/Users/artem/.tagit/AuthKey_JJAMJ74BW7.p8",
+        "ascApiKeyId": "JJAMJ74BW7",
+        "ascApiKeyIssuerId": "ff358288-fe0e-4bcb-b828-b6191814fc52"
       }
     }
   }
