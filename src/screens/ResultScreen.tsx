@@ -116,8 +116,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   scanAgainText: {
+    color: colors.textInverse,
     fontSize: fontSize.lg,
-    color: colors.text,
     fontWeight: "700",
   },
 });

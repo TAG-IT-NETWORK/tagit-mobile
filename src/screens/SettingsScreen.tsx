@@ -52,13 +52,13 @@ function Row({
   const body = (
     <View style={[styles.row, !first && styles.rowBorder]}>
       {icon && (
-        <Ionicons name={icon} size={18} color={destructive ? colors.error : colors.textSecondary} />
+        <Ionicons name={icon} size={20} color={destructive ? colors.error : colors.textSecondary} />
       )}
       <Text style={[styles.rowLabel, { color }]}>{label}</Text>
       <View style={styles.rowRight}>
         {value !== undefined && <Text style={styles.rowValue}>{value}</Text>}
         {onPress && !destructive && (
-          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+          <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
         )}
       </View>
     </View>

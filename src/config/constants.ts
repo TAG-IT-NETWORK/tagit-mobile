@@ -23,16 +23,16 @@ export const STATE_DISPLAY_NAMES: Record<string, string> = {
   UNKNOWN: "Unknown",
 };
 
-/** Colors per lifecycle state (dark-theme friendly) */
+/** Colors per lifecycle state (tuned for WHITE badges, WCAG AA on tint) */
 export const STATE_COLORS: Record<string, string> = {
-  NONE: "#6B7280",      // gray
-  MINTED: "#8B5CF6",    // purple
-  BOUND: "#3B82F6",     // blue
-  ACTIVATED: "#10B981",  // green
-  CLAIMED: "#F59E0B",   // amber
-  FLAGGED: "#EF4444",   // red
-  RECYCLED: "#6B7280",  // gray
-  UNKNOWN: "#6B7280",
+  NONE: "#52525B",      // gray
+  MINTED: "#6D28D9",    // violet (brand accent)
+  BOUND: "#1D4ED8",     // blue
+  ACTIVATED: "#065F46", // emerald
+  CLAIMED: "#92400E",   // amber
+  FLAGGED: "#B91C1C",   // red
+  RECYCLED: "#52525B",  // gray
+  UNKNOWN: "#52525B",
 };
 
 /** Shorten an address for display: 0x1234...abcd */

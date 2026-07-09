@@ -72,7 +72,7 @@ export function VaultDetailScreen({ route, navigation }: Props) {
         onPress={askAboutThis}
         style={({ pressed }) => [styles.askBtn, pressed && { opacity: 0.85 }]}
       >
-        <Ionicons name="sparkles" size={18} color={colors.text} />
+        <Ionicons name="sparkles" size={18} color={colors.textInverse} />
         <Text style={styles.askText}>Ask about this asset</Text>
       </Pressable>
 
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     marginTop: spacing.lg,
   },
-  askText: { color: colors.text, fontSize: fontSize.md, fontWeight: "700" },
+  askText: { color: colors.textInverse, fontSize: fontSize.md, fontWeight: "700" },
   facts: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.primaryDim,
   },
-  typePillText: { fontSize: 11, color: colors.primary, fontWeight: "700", textTransform: "uppercase" },
+  typePillText: { fontSize: fontSize.xs, color: colors.accent, fontWeight: "700", textTransform: "uppercase" },
   description: {
     fontSize: fontSize.md,
     color: colors.textSecondary,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   skillName: { fontSize: fontSize.md, fontWeight: "600", color: colors.text },
-  skillDesc: { fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 18 },
+  skillDesc: { fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 20 },
   tagRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs, marginTop: 2 },
   tag: {
     paddingHorizontal: spacing.sm,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceLight,
   },
-  tagText: { fontSize: 10, color: colors.textMuted, fontWeight: "600" },
+  tagText: { fontSize: fontSize.xs, color: colors.textMuted, fontWeight: "600" },
   deployBtn: {
     flexDirection: "row",
     alignItems: "center",

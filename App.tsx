@@ -1,13 +1,22 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { colors } from "./src/theme/colors";
 
-const DarkTheme = {
+// Honor iOS "Larger Text" up to +40% without breaking fixed-height chrome.
+// Drop to 1.3 if the ScanButton ring overflows at the max setting on device.
+const DYNAMIC_TYPE_CAP = 1.4;
+const TextDefaults = (Text as unknown as { defaultProps?: Record<string, unknown> });
+TextDefaults.defaultProps = { ...TextDefaults.defaultProps, allowFontScaling: true, maxFontSizeMultiplier: DYNAMIC_TYPE_CAP };
+const InputDefaults = (RNTextInput as unknown as { defaultProps?: Record<string, unknown> });
+InputDefaults.defaultProps = { ...InputDefaults.defaultProps, maxFontSizeMultiplier: DYNAMIC_TYPE_CAP };
+
+const LightTheme = {
   ...DefaultTheme,
-  dark: true,
+  dark: false,
   colors: {
     ...DefaultTheme.colors,
     primary: colors.primary,
@@ -15,7 +24,7 @@ const DarkTheme = {
     card: colors.surface,
     text: colors.text,
     border: colors.border,
-    notification: colors.primary,
+    notification: colors.accent,
   },
 };
 
@@ -51,8 +60,9 @@ class ErrorBoundary extends React.Component<
 export default function App() {
   return (
     <SafeAreaProvider>
+      <StatusBar style="dark" />
       <ErrorBoundary>
-        <NavigationContainer theme={DarkTheme}>
+        <NavigationContainer theme={LightTheme}>
           <RootNavigator />
         </NavigationContainer>
       </ErrorBoundary>
@@ -78,5 +88,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
   },
-  retryText: { color: colors.text, fontWeight: "700", fontSize: 15 },
+  retryText: { color: colors.textInverse, fontWeight: "700", fontSize: 15 },
 });

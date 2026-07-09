@@ -9,10 +9,9 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { ScanButton } from "../components/ScanButton";
 import { ErrorBanner } from "../components/ErrorBanner";
@@ -72,25 +71,10 @@ export function HomeScreen() {
   }, [phase, demoMode, tokenIdOverride, cancel, startDemo, startScan]);
 
   const nfcUnavailable = nfcStatus === "unsupported" && !demoMode;
-  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-
-      {/* Settings gear — absolute children ignore SafeAreaView's inset padding,
-          so offset below the status bar explicitly; taps landing in the status
-          bar belong to the system (iOS scroll-to-top) and never reach the app. */}
-      <TouchableOpacity
-        style={[styles.settingsBtn, { top: insets.top + spacing.sm }]}
-        onPress={() => nav.navigate("Settings")}
-        activeOpacity={0.7}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        accessibilityRole="button"
-        accessibilityLabel="Settings"
-      >
-        <Ionicons name="settings-outline" size={22} color={colors.textSecondary} />
-      </TouchableOpacity>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -121,7 +105,7 @@ export function HomeScreen() {
           <Text style={styles.hint}>Hold phone near NFC chip...</Text>
         )}
         {phase === "idle" && nfcStatus === "unsupported" && !demoMode && (
-          <Text style={styles.hintWarn}>NFC not available — enable Demo Mode</Text>
+          <Text style={styles.hintWarn}>NFC is not available on this device.</Text>
         )}
       </View>
 
@@ -132,35 +116,36 @@ export function HomeScreen() {
         </View>
       )}
 
-      {/* Token ID Input */}
-      <View style={styles.section}>
-        <Text style={styles.inputLabel}>Token ID (optional override)</Text>
-        <TextInput
-          style={styles.input}
-          value={tokenInput}
-          onChangeText={setTokenInput}
-          placeholder="e.g. 1"
-          placeholderTextColor={colors.textMuted}
-          keyboardType="number-pad"
-          returnKeyType="done"
-        />
-      </View>
-
-      {/* Demo Mode Toggle */}
-      <View style={styles.toggleRow}>
-        <View>
-          <Text style={styles.toggleLabel}>Demo Mode</Text>
-          <Text style={styles.toggleDesc}>
-            Verify a sample item without a chip
-          </Text>
-        </View>
-        <Switch
-          value={demoMode}
-          onValueChange={setDemoMode}
-          trackColor={{ false: colors.border, true: colors.primaryDim }}
-          thumbColor={demoMode ? colors.primary : colors.textMuted}
-        />
-      </View>
+      {/* Dev-only controls (token override + demo mode). Hidden in release
+          builds — consumers just tap to scan. */}
+      {__DEV__ && (
+        <>
+          <View style={styles.section}>
+            <Text style={styles.inputLabel}>Token ID (dev override)</Text>
+            <TextInput
+              style={styles.input}
+              value={tokenInput}
+              onChangeText={setTokenInput}
+              placeholder="e.g. 1"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="number-pad"
+              returnKeyType="done"
+            />
+          </View>
+          <View style={styles.toggleRow}>
+            <View>
+              <Text style={styles.toggleLabel}>Demo Mode (dev)</Text>
+              <Text style={styles.toggleDesc}>Verify a sample item without a chip</Text>
+            </View>
+            <Switch
+              value={demoMode}
+              onValueChange={setDemoMode}
+              trackColor={{ false: colors.border, true: colors.accent }}
+              thumbColor={colors.bg}
+            />
+          </View>
+        </>
+      )}
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -195,13 +180,6 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 15,
     marginBottom: spacing.sm,
-  },
-  settingsBtn: {
-    position: "absolute",
-    // top is set inline from the runtime safe-area inset.
-    right: spacing.sm,
-    zIndex: 10,
-    padding: spacing.xs,
   },
   logo: {
     fontSize: fontSize.hero,

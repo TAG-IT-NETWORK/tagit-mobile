@@ -15,7 +15,7 @@ export function WalletPill({ address }: Props) {
     <View style={styles.pill}>
       <Ionicons
         name={address ? "wallet" : "wallet-outline"}
-        size={14}
+        size={16}
         color={address ? colors.success : colors.textMuted}
       />
       <Text style={styles.text}>{address ? shortenAddress(address) : "No wallet"}</Text>

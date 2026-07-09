@@ -20,7 +20,9 @@ export function StatusIndicator({ verified }: StatusIndicatorProps) {
       accessibilityLabel={label}
     >
       <Ionicons name={verified ? "checkmark-circle" : "close-circle"} size={28} color={color} />
-      <Text style={[styles.label, { color }]}>{label}</Text>
+      <Text style={[styles.label, { color }]} numberOfLines={1} adjustsFontSizeToFit>
+        {label}
+      </Text>
     </View>
   );
 }

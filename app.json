@@ -6,11 +6,11 @@
     "version": "0.1.0",
     "newArchEnabled": false,
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#0A0A0A",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FFFFFF",
     "icon": "./assets/icon.png",
     "splash": {
-      "backgroundColor": "#0A0A0A"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "bundleIdentifier": "network.tagit.oracular",
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0A0A0A"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "network.tagit.oracular",
       "permissions": [

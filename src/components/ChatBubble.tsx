@@ -9,7 +9,7 @@ export function ChatBubble({ message, streaming }: { message: ChatMessage; strea
   return (
     <View style={[styles.row, isUser ? styles.rowUser : styles.rowAssistant]}>
       <View style={[styles.bubble, isUser ? styles.user : styles.assistant]}>
-        <Text style={styles.text}>
+        <Text style={[styles.text, isUser ? styles.textUser : styles.textAssistant]}>
           {message.content}
           {streaming && !isUser ? "▋" : ""}
         </Text>
@@ -35,5 +35,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderBottomLeftRadius: radius.sm,
   },
-  text: { color: colors.text, fontSize: fontSize.md, lineHeight: 21 },
+  text: { fontSize: fontSize.md, lineHeight: 24 },
+  textUser: { color: colors.textInverse }, // on primary (black) bubble
+  textAssistant: { color: colors.text }, // on surface bubble
+
 });

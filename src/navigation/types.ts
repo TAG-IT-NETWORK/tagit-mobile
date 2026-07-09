@@ -15,7 +15,6 @@ export type RootStackParamList = {
     challenge: Challenge | null;
   };
   History: undefined;
-  Settings: undefined;
 };
 
 export type TapStackParamList = RootStackParamList;
@@ -37,11 +36,16 @@ export type AgentsStackParamList = {
   AgentDetail: { agent: import("../agents/types").AgentSummary };
 };
 
+/** Profile tab stack — wallet + settings, reachable from every tab. */
+export type ProfileStackParamList = {
+  Profile: undefined;
+};
+
 /** Bottom-tab navigator. */
 export type RootTabParamList = {
   Vault: undefined;
-  Market: undefined;
   Tap: undefined;
   Agents: undefined;
   Ask: undefined;
+  Profile: undefined;
 };

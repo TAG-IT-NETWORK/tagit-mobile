@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomeScreen } from "../screens/HomeScreen";
 import { ResultScreen } from "../screens/ResultScreen";
 import { HistoryScreen } from "../screens/HistoryScreen";
-import { SettingsScreen } from "../screens/SettingsScreen";
 import { colors } from "../theme/colors";
 import type { RootStackParamList } from "./types";
 
@@ -39,11 +38,6 @@ export function TapStackNavigator() {
         name="History"
         component={HistoryScreen}
         options={{ title: "Scan History" }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: "Settings" }}
       />
     </Stack.Navigator>
   );

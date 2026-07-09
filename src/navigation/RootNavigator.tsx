@@ -5,28 +5,27 @@ import { TapStackNavigator } from "./TapStackNavigator";
 import { VaultStackNavigator } from "./VaultStackNavigator";
 import { AskStackNavigator } from "./AskStackNavigator";
 import { AgentsStackNavigator } from "./AgentsStackNavigator";
-import { PlaceholderScreen } from "../screens/PlaceholderScreen";
+import { ProfileStackNavigator } from "./ProfileStackNavigator";
 import { TabBarTapButton } from "../components/TabBarTapButton";
 import { colors } from "../theme/colors";
 import type { RootTabParamList } from "./types";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-function MarketScreen() {
-  return <PlaceholderScreen title="Marketplace" subtitle="Verified trade — coming soon" icon="storefront-outline" />;
-}
+const TAB_ICON = 26;
 
 /**
- * Root bottom-tab navigator. The original verify flow lives unchanged inside
- * the center Tap tab (TapStackNavigator). Market & Agents are placeholders for
- * later phases; Vault & Ask host their own stacks.
+ * Root bottom-tab navigator. The verify flow lives inside the center Tap tab.
+ * Order keeps Tap centered: Vault · Agents · [Tap] · Ask · Profile.
+ * Profile (wallet + settings) replaces the old dead Market placeholder and
+ * makes Settings reachable from every tab.
  */
 export function RootNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
           backgroundColor: colors.surface,
@@ -35,24 +34,22 @@ export function RootNavigator() {
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarLabelStyle: { fontSize: 11 },
+        tabBarLabelStyle: { fontSize: 12 },
       }}
     >
       <Tab.Screen
         name="Vault"
         component={VaultStackNavigator}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cube-outline" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Ionicons name="cube-outline" size={TAB_ICON} color={color} />,
         }}
       />
       <Tab.Screen
-        name="Market"
-        component={MarketScreen}
+        name="Agents"
+        component={AgentsStackNavigator}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="storefront-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="hardware-chip-outline" size={TAB_ICON} color={color} />
           ),
         }}
       />
@@ -70,20 +67,20 @@ export function RootNavigator() {
         }}
       />
       <Tab.Screen
-        name="Agents"
-        component={AgentsStackNavigator}
+        name="Ask"
+        component={AskStackNavigator}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="hardware-chip-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="sparkles-outline" size={TAB_ICON} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="Ask"
-        component={AskStackNavigator}
+        name="Profile"
+        component={ProfileStackNavigator}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="sparkles-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person-outline" size={TAB_ICON} color={color} />
           ),
         }}
       />

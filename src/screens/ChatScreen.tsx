@@ -110,7 +110,7 @@ export function ChatScreen({ route }: Props) {
           onPress={() => onSend(input)}
           disabled={!input.trim() || streaming}
         >
-          <Ionicons name="arrow-up" size={20} color={colors.text} />
+          <Ionicons name="arrow-up" size={20} color={colors.textInverse} />
         </Pressable>
       </View>
     </KeyboardAvoidingView>

@@ -28,7 +28,7 @@ export function ProvenanceTimeline({ events }: Props) {
         <View key={`${e.txHash}-${i}`} style={styles.row}>
           <View style={styles.gutter}>
             <View style={styles.dot}>
-              <Ionicons name={ICONS[e.type] ?? "ellipse"} size={14} color={colors.text} />
+              <Ionicons name={ICONS[e.type] ?? "ellipse"} size={16} color={colors.textInverse} />
             </View>
             {i < events.length - 1 && <View style={styles.line} />}
           </View>

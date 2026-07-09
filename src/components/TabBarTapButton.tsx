@@ -30,7 +30,7 @@ export function TabBarTapButton({ onPress, focused }: Props) {
           pressed && styles.buttonPressed,
         ]}
       >
-        <Ionicons name="scan" size={28} color={colors.text} />
+        <Ionicons name="scan" size={28} color={colors.textInverse} />
       </Pressable>
     </View>
   );
@@ -48,19 +48,19 @@ const styles = StyleSheet.create({
     width: SIZE,
     height: SIZE,
     borderRadius: SIZE / 2,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 4,
     borderColor: colors.bg,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.5,
+    shadowColor: colors.accent,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 6,
   },
   buttonFocused: {
-    backgroundColor: colors.primaryDim,
+    backgroundColor: colors.primary,
   },
   buttonPressed: {
     opacity: 0.85,

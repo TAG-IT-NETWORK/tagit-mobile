@@ -48,10 +48,10 @@ export function OnboardingScreen({ onCreateEmbedded, onConnectExternal }: Props)
         style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
       >
         {busy ? (
-          <ActivityIndicator color={colors.text} />
+          <ActivityIndicator color={colors.textInverse} />
         ) : (
           <>
-            <Ionicons name="add-circle-outline" size={20} color={colors.text} />
+            <Ionicons name="add-circle-outline" size={22} color={colors.textInverse} />
             <Text style={styles.primaryText}>Create my wallet</Text>
           </>
         )}
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     width: "100%",
     minHeight: 52,
   },
-  primaryText: { color: colors.text, fontSize: fontSize.lg, fontWeight: "700" },
+  primaryText: { color: colors.textInverse, fontSize: fontSize.lg, fontWeight: "700" },
   secondaryBtn: {
     flexDirection: "row",
     alignItems: "center",
