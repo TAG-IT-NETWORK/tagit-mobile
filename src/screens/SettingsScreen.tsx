@@ -56,7 +56,11 @@ function Row({
       )}
       <Text style={[styles.rowLabel, { color }]}>{label}</Text>
       <View style={styles.rowRight}>
-        {value !== undefined && <Text style={styles.rowValue}>{value}</Text>}
+        {value !== undefined && (
+          <Text style={styles.rowValue} numberOfLines={1} ellipsizeMode="middle">
+            {value}
+          </Text>
+        )}
         {onPress && !destructive && (
           <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
         )}
@@ -169,9 +173,11 @@ const styles = StyleSheet.create({
   addressBlock: { flexDirection: "column", alignItems: "flex-start", gap: spacing.xs },
   addressHint: { fontSize: fontSize.xs, color: colors.textMuted },
   fullAddress: { fontSize: fontSize.sm, color: colors.text, fontFamily: "monospace" },
-  rowLabel: { flex: 1, fontSize: fontSize.md, color: colors.text },
-  rowRight: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
-  rowValue: { fontSize: fontSize.sm, color: colors.textSecondary, fontFamily: "monospace" },
+  // Label keeps its natural width (never collapses to a char-per-line column);
+  // the value fills the rest and truncates in the middle for long URLs.
+  rowLabel: { fontSize: fontSize.md, color: colors.text },
+  rowRight: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: spacing.xs },
+  rowValue: { flexShrink: 1, textAlign: "right", fontSize: fontSize.sm, color: colors.textSecondary, fontFamily: "monospace" },
   tagline: {
     textAlign: "center",
     color: colors.textMuted,

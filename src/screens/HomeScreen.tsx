@@ -156,8 +156,9 @@ export function HomeScreen() {
           <Text style={styles.historyLink}>View History</Text>
         </TouchableOpacity>
         <View style={styles.netBadge}>
-          <View style={styles.netDot} />
-          <Text style={styles.netBadgeText}>Base Sepolia · Testnet</Text>
+          <View style={styles.baseLogo} />
+          <Text style={styles.netBadgeText}>Powered by Base</Text>
+          <Text style={styles.netBadgeSub}>· Testnet</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -258,29 +259,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 7,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  netDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.warning,
+  baseLogo: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "#0052FF", // Base brand blue
   },
   netBadgeText: {
+    fontSize: fontSize.sm,
+    color: colors.text,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+  },
+  netBadgeSub: {
     fontSize: fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontWeight: "600",
-    letterSpacing: 0.3,
   },
   historyLink: {
-    fontSize: fontSize.sm,
-    color: colors.primary,
-    fontWeight: "600",
+    fontSize: fontSize.md,
+    color: colors.accent,
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
   footerText: {

@@ -18,11 +18,11 @@ export const radius = {
 // iOS-HIG-aligned ramp anchored on a 17pt body (SF "Body"). Every screen
 // imports from here, so this block rescales the whole app.
 export const fontSize = {
-  xs: 12, // captions, pills, badges, meta (iOS Caption1)
-  sm: 14, // secondary/supporting body (iOS Footnote/Subheadline)
+  xs: 13, // captions, pills, badges, meta
+  sm: 15, // secondary/supporting body
   md: 17, // DEFAULT BODY — matches iOS SF "Body" 17pt
-  lg: 20, // card titles / section headers (iOS Title3)
-  xl: 24, // screen titles (iOS Title2)
-  xxl: 30, // large headings (iOS Title1)
-  hero: 40, // hero/display numerals (iOS LargeTitle+)
+  lg: 21, // card titles / section headers
+  xl: 25, // screen titles
+  xxl: 31, // large headings
+  hero: 42, // hero/display numerals
 } as const;

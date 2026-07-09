@@ -28,38 +28,47 @@ export function ScanButton({ phase, onPress, disabled }: ScanButtonProps) {
     phase === "verifying";
 
   useEffect(() => {
-    if (phase === "scanning") {
-      // Pulse animation while scanning
+    const breathe = (peak: number, dur: number) =>
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
-            toValue: 1.08,
-            duration: 800,
+            toValue: peak,
+            duration: dur,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: true,
           }),
           Animated.timing(pulseAnim, {
             toValue: 1,
-            duration: 800,
+            duration: dur,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: true,
           }),
         ]),
-      ).start();
+      );
+
+    let anim: Animated.CompositeAnimation | undefined;
+    if (phase === "scanning") {
+      anim = breathe(1.08, 800); // active pulse
+      anim.start();
     } else if (phase === "health-check" || phase === "challenging" || phase === "verifying") {
-      // Spin animation while verifying
-      Animated.loop(
+      anim = Animated.loop(
         Animated.timing(rotateAnim, {
           toValue: 1,
           duration: 1500,
           easing: Easing.linear,
           useNativeDriver: true,
         }),
-      ).start();
+      );
+      anim.start();
     } else {
-      pulseAnim.setValue(1);
       rotateAnim.setValue(0);
+      anim = breathe(1.03, 1600); // gentle idle breathing
+      anim.start();
     }
+    return () => {
+      anim?.stop();
+      pulseAnim.setValue(1);
+    };
   }, [phase, pulseAnim, rotateAnim]);
 
   const spin = rotateAnim.interpolate({

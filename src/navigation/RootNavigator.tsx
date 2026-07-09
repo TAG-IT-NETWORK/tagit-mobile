@@ -1,6 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TapStackNavigator } from "./TapStackNavigator";
 import { VaultStackNavigator } from "./VaultStackNavigator";
 import { AskStackNavigator } from "./AskStackNavigator";
@@ -12,15 +13,18 @@ import type { RootTabParamList } from "./types";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const TAB_ICON = 26;
+const TAB_ICON = 28;
+const BAR_CONTENT = 60; // icon + label area above the home-indicator inset
 
 /**
  * Root bottom-tab navigator. The verify flow lives inside the center Tap tab.
  * Order keeps Tap centered: Vault · Agents · [Tap] · Ask · Profile.
  * Profile (wallet + settings) replaces the old dead Market placeholder and
- * makes Settings reachable from every tab.
+ * makes Settings reachable from every tab. Bar height tracks the safe-area
+ * inset so labels never crowd the home indicator.
  */
 export function RootNavigator() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -30,11 +34,12 @@ export function RootNavigator() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: BAR_CONTENT + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom - 2 : 10,
+          paddingTop: 10,
         },
-        tabBarLabelStyle: { fontSize: 12 },
+        tabBarLabelStyle: { fontSize: 13, fontWeight: "600", marginTop: 2 },
+        tabBarIconStyle: { marginTop: 2 },
       }}
     >
       <Tab.Screen
