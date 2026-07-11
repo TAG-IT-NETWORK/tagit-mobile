@@ -34,7 +34,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-sse": "^1.2.1",
     "viem": "2.51.3",
-    "zustand": "^5.0.13"
+    "zustand": "^5.0.13",
+    "expo-clipboard": "~7.0.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

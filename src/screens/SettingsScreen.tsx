@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
+import type { Address } from "viem";
 import { useWallet } from "../wallet/useWallet";
+import { useBalance } from "../wallet/useBalance";
 import { useHistory } from "../hooks/useHistory";
 import { API_URL, VERIFIER_URL } from "../config/env";
 import { BASE_SEPOLIA_CHAIN_ID } from "../onchain/addresses";
@@ -77,7 +81,17 @@ function Row({
 
 export function SettingsScreen() {
   const { activeAddress, mode, forget } = useWallet();
+  const { eth } = useBalance((activeAddress as Address | null) ?? null);
   const { clear: clearHistory } = useHistory();
+  const [copied, setCopied] = useState(false);
+
+  const copyAddress = async () => {
+    if (!activeAddress) return;
+    await Clipboard.setStringAsync(activeAddress);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   const confirmForget = () =>
     Alert.alert(
@@ -108,12 +122,23 @@ export function SettingsScreen() {
           {activeAddress && (
             <Row icon="information-circle-outline" label="Type" value={mode === "connected" ? "Connected" : "On-device"} />
           )}
+          {activeAddress && <Row icon="cash-outline" label="Balance" value={eth ? `${eth} ETH` : "…"} />}
           {activeAddress && (
             <View style={[styles.row, styles.rowBorder, styles.addressBlock]}>
-              <Text style={styles.addressHint}>Full address — hold to copy</Text>
+              <Text style={styles.addressHint}>Full address</Text>
               <Text style={styles.fullAddress} selectable>
                 {activeAddress}
               </Text>
+              <TouchableOpacity onPress={copyAddress} style={styles.copyBtn} activeOpacity={0.7}>
+                <Ionicons
+                  name={copied ? "checkmark" : "copy-outline"}
+                  size={16}
+                  color={copied ? colors.success : colors.accent}
+                />
+                <Text style={[styles.copyText, copied && { color: colors.success }]}>
+                  {copied ? "Copied" : "Copy address"}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
           {activeAddress && (
@@ -173,6 +198,8 @@ const styles = StyleSheet.create({
   addressBlock: { flexDirection: "column", alignItems: "flex-start", gap: spacing.xs },
   addressHint: { fontSize: fontSize.xs, color: colors.textMuted },
   fullAddress: { fontSize: fontSize.sm, color: colors.text, fontFamily: "monospace" },
+  copyBtn: { flexDirection: "row", alignItems: "center", gap: spacing.xs, marginTop: spacing.xs, paddingVertical: 4 },
+  copyText: { fontSize: fontSize.sm, color: colors.accent, fontWeight: "700" },
   // Label keeps its natural width (never collapses to a char-per-line column);
   // the value fills the rest and truncates in the middle for long URLs.
   rowLabel: { fontSize: fontSize.md, color: colors.text },
