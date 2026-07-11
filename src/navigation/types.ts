@@ -23,6 +23,7 @@ export type TapStackParamList = RootStackParamList;
 export type VaultStackParamList = {
   VaultList: undefined;
   AssetDetail: { tokenId: string };
+  Transfer: { tokenId: string; assetName?: string };
 };
 
 /** Ask tab stack. Optionally grounded on a specific asset. */

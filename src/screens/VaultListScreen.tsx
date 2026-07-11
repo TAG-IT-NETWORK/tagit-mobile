@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -43,6 +44,14 @@ export function VaultListScreen({ navigation }: Props) {
   // Dev override: query a known holder so the Vault is populated for demos.
   const queryAddress = DEV_OWNER || activeAddress;
   const { assets, loading, error, refresh } = useOwnedAssets(queryAddress);
+
+  // Re-query when returning to the Vault (e.g. after a transfer) so a
+  // just-sent asset drops out of the list without a manual pull-to-refresh.
+  useFocusEffect(
+    useCallback(() => {
+      void refresh();
+    }, [refresh]),
+  );
 
   if (!activeAddress && !DEV_OWNER) {
     // Keystore read failed: offer retry, never onboarding — "Create my wallet"

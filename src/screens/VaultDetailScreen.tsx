@@ -11,8 +11,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAssetDetail } from "../vault/useVault";
+import { useWallet } from "../wallet/useWallet";
 import { ProvenanceTimeline } from "../components/ProvenanceTimeline";
 import { stateColor, stateLabel } from "../vault/lifecycle";
+import { STATE_CLAIMED } from "../wallet/transfer";
 import { shortenAddress, shortenHash } from "../config/constants";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
@@ -23,6 +25,16 @@ type Props = NativeStackScreenProps<VaultStackParamList, "AssetDetail">;
 export function VaultDetailScreen({ route, navigation }: Props) {
   const { tokenId } = route.params;
   const { asset, loading, error } = useAssetDetail(tokenId);
+  const { activeAddress } = useWallet();
+
+  // Transfer is offered only for a CLAIMED asset the ACTIVE wallet actually
+  // owns (so it can sign). When a DEV_OWNER override shows someone else's
+  // vault, the active wallet isn't the owner → no Send button (SEC model).
+  const canTransfer =
+    !!asset &&
+    !!activeAddress &&
+    asset.stateCode === STATE_CLAIMED &&
+    asset.owner.toLowerCase() === activeAddress.toLowerCase();
 
   // Jump to the Ask tab, grounded on this asset (cross-navigator hop).
   const askAboutThis = () => {
@@ -75,6 +87,16 @@ export function VaultDetailScreen({ route, navigation }: Props) {
         <Ionicons name="sparkles" size={18} color={colors.textInverse} />
         <Text style={styles.askText}>Ask about this asset</Text>
       </Pressable>
+
+      {canTransfer ? (
+        <Pressable
+          onPress={() => navigation.navigate("Transfer", { tokenId: asset.tokenId, assetName: asset.name })}
+          style={({ pressed }) => [styles.sendBtn, pressed && { opacity: 0.85 }]}
+        >
+          <Ionicons name="paper-plane-outline" size={18} color={colors.text} />
+          <Text style={styles.sendText}>Send / Transfer</Text>
+        </Pressable>
+      ) : null}
 
       <View style={styles.facts}>
         <Fact label="Token ID" value={`#${asset.tokenId}`} />
@@ -160,6 +182,19 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   askText: { color: colors.textInverse, fontSize: fontSize.md, fontWeight: "700" },
+  sendBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
+  },
+  sendText: { color: colors.text, fontSize: fontSize.md, fontWeight: "700" },
   facts: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

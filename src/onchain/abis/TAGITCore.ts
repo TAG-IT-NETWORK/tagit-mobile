@@ -10,6 +10,19 @@
  */
 export const tagitCoreAbi = [
   {
+    // Secondary-market resale: the ONLY sanctioned consumer-to-consumer
+    // transfer. Owner-gated + CLAIMED-only, enforced on-chain; direct ERC-721
+    // transfers are blocked by the _update() override. See SEC_TRANSFER_STRIDE.
+    type: "function",
+    name: "transferAsset",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "tokenId", type: "uint256" },
+      { name: "to", type: "address" },
+    ],
+    outputs: [],
+  },
+  {
     type: "function",
     name: "balanceOf",
     stateMutability: "view",
@@ -109,6 +122,16 @@ export const tagitCoreAbi = [
       { name: "from", type: "address", indexed: true },
       { name: "to", type: "address", indexed: true },
       { name: "tokenId", type: "uint256", indexed: true },
+    ],
+  },
+  {
+    type: "event",
+    name: "AssetResold",
+    anonymous: false,
+    inputs: [
+      { name: "tokenId", type: "uint256", indexed: true },
+      { name: "seller", type: "address", indexed: true },
+      { name: "buyer", type: "address", indexed: true },
     ],
   },
 ] as const;
