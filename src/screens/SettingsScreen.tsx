@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import * as Clipboard from "expo-clipboard";
@@ -9,10 +11,11 @@ import type { Address } from "viem";
 import { useWallet } from "../wallet/useWallet";
 import { useBalance } from "../wallet/useBalance";
 import { useHistory } from "../hooks/useHistory";
-import { API_URL, VERIFIER_URL } from "../config/env";
+import { API_URL, VERIFIER_URL, DEV_OWNER } from "../config/env";
 import { BASE_SEPOLIA_CHAIN_ID } from "../onchain/addresses";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
+import type { ProfileStackParamList } from "../navigation/types";
 
 function shorten(addr: string): string {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
@@ -80,6 +83,7 @@ function Row({
 }
 
 export function SettingsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const { activeAddress, mode, forget } = useWallet();
   const { eth } = useBalance((activeAddress as Address | null) ?? null);
   const { clear: clearHistory } = useHistory();
@@ -123,6 +127,12 @@ export function SettingsScreen() {
             <Row icon="information-circle-outline" label="Type" value={mode === "connected" ? "Connected" : "On-device"} />
           )}
           {activeAddress && <Row icon="cash-outline" label="Balance" value={eth ? `${eth} ETH` : "…"} />}
+          {/* Hidden under DEV_OWNER: the Vault then shows someone else's
+              assets, and soliciting deposits to the device wallet would
+              strand the user (same rule as the Transfer button). */}
+          {activeAddress && !DEV_OWNER && (
+            <Row icon="qr-code-outline" label="Receive" onPress={() => navigation.navigate("Receive")} />
+          )}
           {activeAddress && (
             <View style={[styles.row, styles.rowBorder, styles.addressBlock]}>
               <Text style={styles.addressHint}>Full address</Text>

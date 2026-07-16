@@ -40,6 +40,7 @@ export type AgentsStackParamList = {
 /** Profile tab stack — wallet + settings, reachable from every tab. */
 export type ProfileStackParamList = {
   Profile: undefined;
+  Receive: undefined;
 };
 
 /** Bottom-tab navigator. */

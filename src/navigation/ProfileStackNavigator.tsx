@@ -1,6 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SettingsScreen } from "../screens/SettingsScreen";
+import { ReceiveScreen } from "../screens/ReceiveScreen";
 import { colors } from "../theme/colors";
 import type { ProfileStackParamList } from "./types";
 
@@ -22,6 +23,7 @@ export function ProfileStackNavigator() {
       }}
     >
       <Stack.Screen name="Profile" component={SettingsScreen} options={{ title: "Profile" }} />
+      <Stack.Screen name="Receive" component={ReceiveScreen} options={{ title: "Receive" }} />
     </Stack.Navigator>
   );
 }
