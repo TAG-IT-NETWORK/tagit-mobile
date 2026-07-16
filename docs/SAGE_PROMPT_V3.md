@@ -88,9 +88,13 @@ just its code, and confirm the local checkout is at `origin/main` before editing
   produced. Android EAS dev APK was built + installed on a device (June 1). No app
   CI (the lone workflow is dead code that can never trigger). No Maestro/E2E harness.
   `ITSAppUsesNonExemptEncryption:false` and NFC usage strings already set.
-- **API key debt:** `EXPO_PUBLIC_API_KEY=tagit-hack-2026-key` (hackathon-era, shared
-  across all profiles) is committed in eas.json — issue/rotate a distinct
-  rate-limited production key server-side before the investor build.
+- **API key:** ROTATED 2026-07-16 — the leaked hackathon-era key was retired.
+  `EXPO_PUBLIC_API_KEY` now lives ONLY in EAS environment variables (sensitive,
+  all three environments; eas.json profiles pin `environment`) and the
+  gitignored local `.env`. Never commit a key value to this repo again.
+  Remember `EXPO_PUBLIC_*` is inlined into the app bundle — the durable
+  security boundary is server-side payment enforcement + user auth, not key
+  secrecy (`SALE_REQUIRE_PAYMENT=true` verified live on Cloud Run 2026-07-16).
 - **Local-install gotcha:** the monorepo's pnpm workspace silently overrides this
   app's `.npmrc node-linker=hoisted` and produces a broken tree (tsc "cannot find
   module"). Install with `pnpm install --ignore-workspace --frozen-lockfile` from
