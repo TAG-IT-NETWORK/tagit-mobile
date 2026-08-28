@@ -70,7 +70,7 @@ export async function verifySunViaWeb(
   const uid = body.uid ?? sun.uid;
   const chain = body.chain ?? { id: 84532, name: "Base Sepolia" };
 
-  const asset = body.asset ?? {
+  const asset: NonNullable<WebVerifyResponse["asset"]> = body.asset ?? {
     tokenId: "0",
     stateCode: 0,
     lifecycleState: body.reason ?? "UNVERIFIED",
@@ -86,6 +86,15 @@ export async function verifySunViaWeb(
       stateCode: asset.stateCode,
       owner: asset.owner,
       timestamp: asset.timestamp,
+      // Product fields the verifier already returns (META-T38): mapped
+      // through instead of discarded so Result/Vault surfaces can render
+      // name/image/brand/sku/origin/msrp without a second fetch.
+      name: asset.name,
+      image: asset.image,
+      brand: asset.brand,
+      sku: asset.sku,
+      origin: asset.origin,
+      msrp: asset.msrp,
     },
     // SUN proof model: the chip's truncated AES-CMAC over the encrypted PICC is
     // the cryptographic attestation (verified server-side with the SDM key).

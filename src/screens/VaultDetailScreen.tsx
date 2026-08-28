@@ -2,7 +2,6 @@ import React from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   ActivityIndicator,
@@ -11,6 +10,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAssetDetail } from "../vault/useVault";
+import { detailImageUri } from "../vault/display";
+import { AssetImage } from "../components/AssetImage";
 import { useWallet } from "../wallet/useWallet";
 import { ProvenanceTimeline } from "../components/ProvenanceTimeline";
 import { stateColor, stateLabel } from "../vault/lifecycle";
@@ -64,11 +65,13 @@ export function VaultDetailScreen({ route, navigation }: Props) {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <View style={styles.hero}>
-        {asset.image ? (
-          <Image source={{ uri: asset.image }} style={styles.image} resizeMode="cover" />
-        ) : (
-          <Ionicons name="cube-outline" size={64} color={colors.textMuted} />
-        )}
+        <AssetImage
+          uri={detailImageUri(asset)}
+          blurhash={asset.blurhash}
+          recyclingKey={asset.tokenId}
+          style={styles.image}
+          fallbackIconSize={64}
+        />
       </View>
 
       <View style={styles.titleRow}>

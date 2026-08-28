@@ -1,30 +1,38 @@
 import React from "react";
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
 import { stateColor, stateLabel } from "../vault/lifecycle";
-import type { AssetSummary } from "../vault/types";
+import { gridImageUri, listedBadgeLabel, type PricedAsset } from "../vault/display";
+import { AssetImage } from "./AssetImage";
 
 interface Props {
-  asset: AssetSummary;
+  /** Summary row; may additionally carry a price block (detail-shaped rows). */
+  asset: PricedAsset;
   onPress: () => void;
 }
 
-/** Grid card for one owned asset: image (or fallback), title, lifecycle badge. */
+/**
+ * Grid card for one owned asset: image (sm CDN thumb with blurhash
+ * placeholder, or the cube fallback), title, lifecycle badge, and a
+ * "Listed · $xx.xx" badge when the asset is listed with a display price.
+ */
 export function AssetCard({ asset, onPress }: Props) {
   const badgeColor = stateColor(asset.stateCode);
+  const listedLabel = listedBadgeLabel(asset);
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.imageWrap}>
-        {asset.image ? (
-          <Image source={{ uri: asset.image }} style={styles.image} resizeMode="cover" />
-        ) : (
-          <Ionicons name="cube-outline" size={40} color={colors.textMuted} />
-        )}
+        <AssetImage
+          uri={gridImageUri(asset)}
+          blurhash={asset.blurhash}
+          recyclingKey={asset.tokenId}
+          style={styles.image}
+          fallbackIconSize={40}
+        />
       </View>
       <Text style={styles.title} numberOfLines={1}>
         {asset.name ?? `Asset #${asset.tokenId}`}
@@ -37,6 +45,11 @@ export function AssetCard({ asset, onPress }: Props) {
           </Text>
         </View>
       </View>
+      {listedLabel ? (
+        <View style={styles.listedBadge}>
+          <Text style={styles.listedText}>{listedLabel}</Text>
+        </View>
+      ) : null}
     </Pressable>
   );
 }
@@ -77,4 +90,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   badgeText: { fontSize: fontSize.xs, fontWeight: "700" },
+  listedBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.successDim,
+    borderColor: colors.success,
+    borderWidth: 1,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    marginTop: spacing.xs,
+  },
+  listedText: { color: colors.success, fontSize: fontSize.xs, fontWeight: "700" },
 });
