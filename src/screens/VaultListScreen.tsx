@@ -48,8 +48,10 @@ export function VaultListScreen({ navigation }: Props) {
   }, [navigation, activeAddress]);
 
   // Dev override: query a known holder so the Vault is populated for demos.
+  // Cache-first (META-T38): the persisted per-owner list renders instantly;
+  // refresh() is a background conditional refetch (ETag; 304 = no-op).
   const queryAddress = DEV_OWNER || activeAddress;
-  const { assets, loading, error, refresh } = useOwnedAssets(queryAddress);
+  const { assets, loading, refreshing, error, refresh } = useOwnedAssets(queryAddress);
 
   // Client-side search + state filter over the fetched list.
   const [query, setQuery] = useState("");
@@ -194,7 +196,7 @@ export function VaultListScreen({ navigation }: Props) {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={refresh} tintColor={colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />
         }
         ListEmptyComponent={
           <View style={styles.noMatches}>
