@@ -21,6 +21,15 @@ import type {
 } from "./types";
 
 /**
+ * Raw owner-list item as the wire may carry it: the serializer marks absent
+ * additive fields either by omission or with an explicit `null` — normalize
+ * both to "absent" so cached summaries keep the AssetSummary contract.
+ */
+type RawAssetSummary = Omit<AssetSummary, "thumb" | "blurhash" | "price"> & {
+  [K in "thumb" | "blurhash" | "price"]?: AssetSummary[K] | null;
+};
+
+/**
  * CDN media object URL: https://media.tagit.network/i/<sha256>/<variant>.webp
  * (mirrors tagit-services mediaObjectKey). Variant suffixes: orig/lg/md/sm/t.
  */
@@ -47,12 +56,20 @@ export function heroMedia(media: AssetMediaEntry[] | undefined): AssetMediaEntry
 }
 
 /**
- * Map one raw summary from GET /api/v1/assets. Pass-through today (the shape
- * already matches), kept as the single seam where summary-level additions
- * (server-sent thumb/blurhash) land without touching call sites.
+ * Map one raw summary from GET /api/v1/assets. Legacy fields pass through
+ * untouched; the additive per-item fields the owner-list endpoint sends
+ * (Week-C services) — `thumb`, `blurhash`, `price: { display, saleState }` —
+ * are consumed by name, with null/absent normalized to absent so the no-image
+ * fallback and no-badge paths stay intact against older deployed services.
  */
-export function mapAssetSummary(raw: AssetSummary): AssetSummary {
-  return raw;
+export function mapAssetSummary(raw: RawAssetSummary): AssetSummary {
+  const { thumb, blurhash, price, ...rest } = raw;
+  return {
+    ...rest,
+    ...(thumb != null ? { thumb } : {}),
+    ...(blurhash != null ? { blurhash } : {}),
+    ...(price != null ? { price } : {}),
+  };
 }
 
 /**
@@ -62,11 +79,9 @@ export function mapAssetSummary(raw: AssetSummary): AssetSummary {
  */
 export function mapAssetDetail(raw: AssetDetail): AssetDetail {
   const hero = heroMedia(raw.media);
-  // Prefer a server-sent variants map; otherwise rewrite the CDN URL.
-  const thumb =
-    raw.thumb ??
-    hero?.variants?.sm ??
-    mediaVariantUrl(hero?.url, "sm");
+  // Variant selection is the CDN URL rewrite — the deployed serializer never
+  // sends a variants map, only the hero entry's canonical url.
+  const thumb = raw.thumb ?? mediaVariantUrl(hero?.url, "sm");
   const blurhash = raw.blurhash ?? hero?.blurhash;
   const msrp = raw.msrp ?? raw.price?.msrp;
   const saleState = raw.saleState ?? raw.price?.saleState;
@@ -82,7 +97,8 @@ export function mapAssetDetail(raw: AssetDetail): AssetDetail {
 
 /**
  * Project a detail down to its summary (all summary fields incl. the derived
- * thumb/blurhash) — lets a fresh detail fetch refresh the cached Vault cell.
+ * thumb/blurhash and the trimmed {display, saleState} price block) — lets a
+ * fresh detail fetch refresh the cached Vault cell, badge included.
  */
 export function summaryFromDetail(detail: AssetDetail): AssetSummary {
   const mapped = mapAssetDetail(detail);
@@ -96,5 +112,8 @@ export function summaryFromDetail(detail: AssetDetail): AssetSummary {
     timestamp: mapped.timestamp,
     ...(mapped.thumb !== undefined ? { thumb: mapped.thumb } : {}),
     ...(mapped.blurhash !== undefined ? { blurhash: mapped.blurhash } : {}),
+    ...(mapped.price !== undefined
+      ? { price: { display: mapped.price.display, saleState: mapped.price.saleState } }
+      : {}),
   };
 }

@@ -21,19 +21,30 @@ export interface AssetSummary {
   /**
    * Small (sm) CDN variant URL for grid cells, when the asset has processed
    * media (media.tagit.network/i/<sha256>/sm.webp). Additive (META-T38):
-   * derived client-side from the detail media[] block today; the server may
-   * start sending it on summaries directly — both fill the same field.
+   * sent per item by the owner-list endpoint (Week-C services); also derived
+   * client-side from the detail media[] block — both fill the same field.
    */
   thumb?: string;
   /** Blurhash placeholder of the hero image, for instant grid paint. */
   blurhash?: string;
+  /**
+   * Trimmed per-item price block from the owner-list endpoint (Week-C
+   * services, additive): display string + saleState only — no settlement
+   * fields on summaries. Absent when the asset has no listing row (the grid
+   * simply renders no badge). Details narrow this to the full AssetPrice.
+   */
+  price?: AssetSummaryPrice;
 }
 
 // ── Additive detail blocks (META-T09/T22/T29 services DTO — hand-synced) ──
 // Field names/shapes mirror tagit-services buildAssetDetail() exactly.
 // ADDITIVE ONLY: never rename or remove fields; older app builds parse them.
 
-/** One media[] entry from the detail DTO. */
+/**
+ * One media[] entry from the detail DTO. This is the FULL deployed serializer
+ * shape — it never emits more (no sha256, no variants map); other sizes are
+ * derived client-side by rewriting `url` (see mediaVariantUrl).
+ */
 export interface AssetMediaEntry {
   /** "hero" | "gallery" (kept open — server may add roles). */
   role: string;
@@ -43,10 +54,6 @@ export interface AssetMediaEntry {
   lqip?: string;
   /** Blurhash string, when a processed media row is linked. */
   blurhash?: string;
-  /** Content hash of the original upload (present on canonical-doc entries). */
-  sha256?: string;
-  /** Named variant URLs (sm/md/lg/...), when the server sends them. */
-  variants?: Record<string, string>;
 }
 
 /** product block: catalog identity fields from the anchored metadata doc. */
@@ -67,6 +74,13 @@ export interface AssetMsrp {
 }
 
 export type SaleState = "not_for_sale" | "listed" | "sold";
+
+/**
+ * The price subset the owner-list endpoint sends per item ({display,
+ * saleState}) — everything a grid cell's "Listed · $x" badge needs, nothing
+ * settlement-grade. The detail's full AssetPrice is assignable to this.
+ */
+export type AssetSummaryPrice = Pick<AssetPrice, "display" | "saleState">;
 
 /** price block: canonical pricing DTO from the pricing service. */
 export interface AssetPrice {

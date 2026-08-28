@@ -166,7 +166,9 @@ describe("refresh", () => {
 });
 
 describe("cache hydration", () => {
-  it("rehydrates the persisted per-owner cache from AsyncStorage", async () => {
+  it("rehydrates a persisted per-owner cache from AsyncStorage (v0 migrates through)", async () => {
+    // version 0 = pre-versioning payload; the shape is identical, so the
+    // migrate hook keeps it rather than cold-starting existing installs.
     const persisted = {
       state: {
         byOwner: {
@@ -189,7 +191,7 @@ describe("cache hydration", () => {
     expect(useVaultStore.getState().getCached(OWNER)).toEqual([ASSET]);
   });
 
-  it("persists the cache (byOwner only) after a successful refresh", async () => {
+  it("persists the cache (byOwner only) at schema version 1", async () => {
     const fetchMock = mockFetch();
     fetchMock.mockResolvedValueOnce(jsonResponse(LIST_BODY, WEAK_ETAG));
     await useVaultStore.getState().refresh(OWNER);
@@ -199,11 +201,86 @@ describe("cache hydration", () => {
     const raw = await AsyncStorage.getItem("tagit-vault");
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw as string);
+    expect(parsed.version).toBe(1);
     expect(parsed.state.byOwner[KEY].assets).toEqual([ASSET]);
     expect(parsed.state.byOwner[KEY].etag).toBe(WEAK_ETAG);
     // Transient flags never persist.
     expect(parsed.state.refreshing).toBeUndefined();
     expect(parsed.state.errors).toBeUndefined();
+  });
+
+  it("migrates unknown persisted versions to the safe empty shape", async () => {
+    // A payload written by some future build: unknown version, unknown shape.
+    const persisted = {
+      state: { vaults: { [KEY]: { items: [ASSET] } } },
+      version: 99,
+    };
+    await AsyncStorage.setItem("tagit-vault", JSON.stringify(persisted));
+
+    await useVaultStore.persist.rehydrate();
+
+    // Refetchable cache: cold-start empty rather than hydrate garbage.
+    expect(useVaultStore.getState().byOwner).toEqual({});
+    expect(useVaultStore.getState().hasCache(OWNER)).toBe(false);
+    expect(useVaultStore.getState().getCached(OWNER)).toEqual([]);
+  });
+
+  it("hydrate-after-fetch race: a fetch that resolved first beats the stale disk cache", async () => {
+    // 1. A refresh resolves BEFORE rehydration finishes (fresh data, fetchedAt = now).
+    const fetchMock = mockFetch();
+    const fresh = {
+      ...LIST_BODY,
+      assets: [{ ...ASSET, stateCode: 5, lifecycleState: "FLAGGED" }],
+    };
+    fetchMock.mockResolvedValueOnce(jsonResponse(fresh, 'W/"fresh"'));
+    await useVaultStore.getState().refresh(OWNER);
+    // Let persist's own async write settle before planting the stale payload.
+    await new Promise((r) => setTimeout(r, 0));
+
+    // 2. The disk still holds an older cache (stale assets, older fetchedAt).
+    const stale = {
+      state: {
+        byOwner: {
+          [KEY]: { assets: [ASSET], etag: WEAK_ETAG, fetchedAt: 1700000001000 },
+        },
+      },
+      version: 1,
+    };
+    await AsyncStorage.setItem("tagit-vault", JSON.stringify(stale));
+
+    // 3. Rehydration fires late — it must NOT clobber the fresher fetch.
+    await useVaultStore.persist.rehydrate();
+
+    const entry = useVaultStore.getState().byOwner[KEY];
+    expect(entry.assets[0].lifecycleState).toBe("FLAGGED");
+    expect(entry.etag).toBe('W/"fresh"');
+    expect(entry.fetchedAt).toBeGreaterThan(1700000001000);
+  });
+
+  it("hydration still wins for owners the session has not fetched", async () => {
+    const fetchMock = mockFetch();
+    const otherOwner = "0x9999000000000000000000000000000000009999";
+    const fresh = { ...LIST_BODY, owner: otherOwner, assets: [{ ...ASSET, owner: otherOwner }] };
+    fetchMock.mockResolvedValueOnce(jsonResponse(fresh, 'W/"other"'));
+    await useVaultStore.getState().refresh(otherOwner);
+    await new Promise((r) => setTimeout(r, 0));
+
+    const persisted = {
+      state: {
+        byOwner: {
+          [KEY]: { assets: [ASSET], etag: WEAK_ETAG, fetchedAt: 1700000001000 },
+        },
+      },
+      version: 1,
+    };
+    await AsyncStorage.setItem("tagit-vault", JSON.stringify(persisted));
+    await useVaultStore.persist.rehydrate();
+
+    // Per-owner reconcile: the fetched owner keeps its fresh entry, the
+    // never-fetched owner hydrates from disk.
+    expect(useVaultStore.getState().byOwner[ownerKey(otherOwner)].etag).toBe('W/"other"');
+    expect(useVaultStore.getState().byOwner[KEY].assets).toEqual([ASSET]);
+    expect(useVaultStore.getState().byOwner[KEY].etag).toBe(WEAK_ETAG);
   });
 });
 

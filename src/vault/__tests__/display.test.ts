@@ -32,8 +32,10 @@ function summary(overrides: Partial<AssetSummary> = {}): AssetSummary {
 }
 
 function detail(overrides: Partial<AssetDetail> = {}): AssetDetail {
+  // Drop the summary-typed price: details carry the full AssetPrice shape.
+  const { price: _price, ...base } = summary();
   return {
-    ...summary(),
+    ...base,
     flags: 0,
     provenance: [],
     ...overrides,
@@ -64,13 +66,6 @@ describe("gridImageUri (AssetCard image)", () => {
 });
 
 describe("detailImageUri (detail hero loads lg)", () => {
-  it("prefers an explicit lg variant from the hero media entry", () => {
-    const asset = detail({
-      media: [{ role: "hero", url: CDN_MD, mime: "image/webp", variants: { lg: "https://media.tagit.network/i/explicit/lg.webp" } }],
-    });
-    expect(detailImageUri(asset)).toBe("https://media.tagit.network/i/explicit/lg.webp");
-  });
-
   it("rewrites a CDN hero URL to the lg variant", () => {
     const asset = detail({
       media: [{ role: "hero", url: CDN_ORIG, mime: "image/webp" }],
@@ -112,6 +107,14 @@ describe("resultThumbUri (verify Result thumb)", () => {
 describe("listedBadgeLabel (AssetCard 'Listed · $xx.xx' badge)", () => {
   it("renders 'Listed · <display>' when listed with a display price", () => {
     const asset: PricedAsset = { ...summary(), price: listedPrice() };
+    expect(listedBadgeLabel(asset)).toBe("Listed · $1,250.00");
+  });
+
+  it("lights up from the trimmed owner-list price block ({display, saleState} only)", () => {
+    // Exactly what the Week-C list endpoint sends per item — no settlement fields.
+    const asset: PricedAsset = summary({
+      price: { display: "$1,250.00", saleState: "listed" },
+    });
     expect(listedBadgeLabel(asset)).toBe("Listed · $1,250.00");
   });
 

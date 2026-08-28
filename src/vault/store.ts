@@ -54,6 +54,21 @@ export function ownerKey(owner: string): string {
   return owner.toLowerCase();
 }
 
+/** The persisted subset of VaultState (see partialize below). */
+interface PersistedVaultState {
+  byOwner: Record<string, OwnerVaultEntry>;
+}
+
+/** Shallow shape check for a persisted payload we are willing to hydrate. */
+function isPersistedVaultState(value: unknown): value is PersistedVaultState {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as PersistedVaultState).byOwner === "object" &&
+    (value as PersistedVaultState).byOwner !== null
+  );
+}
+
 export const useVaultStore = create<VaultState>()(
   persist(
     (set, get) => ({
@@ -115,9 +130,36 @@ export const useVaultStore = create<VaultState>()(
     }),
     {
       name: "tagit-vault",
+      version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       // Persist only the cache; in-flight/error flags are session-local.
       partialize: (s) => ({ byOwner: s.byOwner }),
+      /**
+       * Runs only on a version mismatch. v0 is the pre-versioning payload
+       * (identical shape) — keep it. Anything else (corrupt, or written by a
+       * newer build) drops to the safe empty shape: this is a refetchable
+       * cache, so an empty vault cache is always correct, just cold.
+       */
+      migrate: (persisted, version) => {
+        if (version === 0 && isPersistedVaultState(persisted)) return persisted;
+        return { byOwner: {} };
+      },
+      /**
+       * Hydration reconcile — closes the hydrate-after-fetch race. AsyncStorage
+       * rehydration is async, so a conditional refetch can land BEFORE the
+       * persisted (stale) cache hydrates; per owner, whichever entry has the
+       * newer fetchedAt wins, so a resolved fetch is never clobbered by the
+       * disk cache. Transient flags always come from the live state.
+       */
+      merge: (persisted, current) => {
+        const disk = isPersistedVaultState(persisted) ? persisted.byOwner : {};
+        const byOwner: Record<string, OwnerVaultEntry> = { ...disk };
+        for (const [key, entry] of Object.entries(current.byOwner)) {
+          const hydrated = byOwner[key];
+          if (!hydrated || hydrated.fetchedAt <= entry.fetchedAt) byOwner[key] = entry;
+        }
+        return { ...current, byOwner };
+      },
     },
   ),
 );

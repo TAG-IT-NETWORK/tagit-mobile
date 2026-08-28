@@ -131,12 +131,6 @@ describe("mapAssetDetail", () => {
     expect(mapped.blurhash).toBe("LKO2?U%2Tw=w]~RBVZRi};RPxuwH");
   });
 
-  it("prefers a server-sent variants map over URL rewriting", () => {
-    const raw = metaDetail();
-    raw.media![0].variants = { sm: "https://media.tagit.network/i/explicit/sm.webp" };
-    expect(mapAssetDetail(raw).thumb).toBe("https://media.tagit.network/i/explicit/sm.webp");
-  });
-
   it("keeps server-sent thumb/blurhash when already present on the body", () => {
     const raw = metaDetail();
     raw.thumb = "https://media.tagit.network/i/server/sm.webp";
@@ -183,22 +177,73 @@ describe("mapAssetDetail", () => {
 });
 
 describe("mapAssetSummary", () => {
-  it("passes summaries through, preserving additive thumb/blurhash", () => {
-    const raw: AssetSummary = {
+  /** Plain legacy list item — what the deployed serializer sends today. */
+  function legacySummary(): AssetSummary {
+    return {
       tokenId: "7",
       owner: "0x1111111111111111111111111111111111111111",
       stateCode: 3,
       lifecycleState: "ACTIVATED",
+      name: "Rolex Submariner",
+      image: "https://ipfs.io/ipfs/QmHash/image.png",
       timestamp: 1,
-      thumb: CDN_SM,
-      blurhash: "HASH",
     };
+  }
+
+  it("passes summaries through, preserving additive thumb/blurhash", () => {
+    const raw: AssetSummary = { ...legacySummary(), thumb: CDN_SM, blurhash: "HASH" };
     expect(mapAssetSummary(raw)).toEqual(raw);
+  });
+
+  it("consumes the Week-C list-item fields by name: thumb, blurhash, price {display, saleState}", () => {
+    // Exactly the per-item shape the owner-list endpoint starts sending.
+    const raw = {
+      ...legacySummary(),
+      thumb: CDN_SM,
+      blurhash: "LKO2?U%2Tw=w",
+      price: { display: "$1,250.00", saleState: "listed" as const },
+    };
+    const mapped = mapAssetSummary(raw);
+    expect(mapped.thumb).toBe(CDN_SM);
+    expect(mapped.blurhash).toBe("LKO2?U%2Tw=w");
+    expect(mapped.price).toEqual({ display: "$1,250.00", saleState: "listed" });
+    // Legacy fields untouched.
+    expect(mapped.tokenId).toBe("7");
+    expect(mapped.image).toBe("https://ipfs.io/ipfs/QmHash/image.png");
+  });
+
+  it("keeps an unpriced price block (display null, not_for_sale)", () => {
+    const raw = {
+      ...legacySummary(),
+      price: { display: null, saleState: "not_for_sale" as const },
+    };
+    expect(mapAssetSummary(raw).price).toEqual({ display: null, saleState: "not_for_sale" });
+  });
+
+  it("leaves absent additive fields absent (older deployed services)", () => {
+    const mapped = mapAssetSummary(legacySummary());
+    expect("thumb" in mapped).toBe(false);
+    expect("blurhash" in mapped).toBe(false);
+    expect("price" in mapped).toBe(false);
+  });
+
+  it("normalizes null additive fields to absent (no-image fallback intact)", () => {
+    const mapped = mapAssetSummary({
+      ...legacySummary(),
+      thumb: null,
+      blurhash: null,
+      price: null,
+    });
+    expect("thumb" in mapped).toBe(false);
+    expect("blurhash" in mapped).toBe(false);
+    expect("price" in mapped).toBe(false);
+    // The grid falls back to the legacy image, not a null thumb.
+    expect(mapped.thumb ?? mapped.image).toBe("https://ipfs.io/ipfs/QmHash/image.png");
   });
 });
 
 describe("summaryFromDetail", () => {
-  it("projects the summary fields incl. derived thumb/blurhash", () => {
+  it("projects the summary fields incl. derived thumb/blurhash and trimmed price", () => {
     const summary = summaryFromDetail(metaDetail());
     expect(summary).toEqual({
       tokenId: "43",
@@ -210,12 +255,15 @@ describe("summaryFromDetail", () => {
       timestamp: 1700000000,
       thumb: CDN_SM,
       blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
+      // Trimmed to the summary price block — no settlement fields leak in.
+      price: { display: "$1,250.00", saleState: "listed" },
     });
   });
 
-  it("omits thumb/blurhash for legacy details", () => {
+  it("omits thumb/blurhash/price for legacy details", () => {
     const summary = summaryFromDetail(legacyDetail());
     expect("thumb" in summary).toBe(false);
     expect("blurhash" in summary).toBe(false);
+    expect("price" in summary).toBe(false);
   });
 });

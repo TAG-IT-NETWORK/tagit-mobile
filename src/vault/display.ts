@@ -8,7 +8,7 @@
  * jest.config.js).
  */
 import { heroMedia, mediaVariantUrl } from "./mapAsset";
-import type { AssetDetail, AssetPrice, AssetSummary, SaleState } from "./types";
+import type { AssetDetail, AssetSummary, SaleState } from "./types";
 
 /**
  * What a Vault grid cell renders: the sm CDN thumb when T38 derived (or the
@@ -20,18 +20,14 @@ export function gridImageUri(asset: AssetSummary): string | undefined {
 }
 
 /**
- * What the detail hero renders: the lg CDN variant when available (explicit
- * variants map first, then CDN URL rewrite), else the raw hero media URL,
- * else the legacy image, else undefined → the cube-icon fallback.
+ * What the detail hero renders: the lg CDN variant when derivable (URL
+ * rewrite of the hero media URL — the deployed serializer sends no variants
+ * map), else the raw hero media URL, else the legacy image, else undefined →
+ * the cube-icon fallback.
  */
 export function detailImageUri(asset: AssetDetail): string | undefined {
   const hero = heroMedia(asset.media);
-  return (
-    hero?.variants?.lg ??
-    mediaVariantUrl(hero?.url, "lg") ??
-    hero?.url ??
-    asset.image
-  );
+  return mediaVariantUrl(hero?.url, "lg") ?? hero?.url ?? asset.image;
 }
 
 /**
@@ -43,11 +39,12 @@ export function resultThumbUri(image: string | undefined): string | undefined {
 }
 
 /**
- * An asset row that may carry pricing: details always can; summaries when the
- * server starts sending price blocks on the list endpoint (additive).
+ * An asset row that may carry pricing. Summaries carry the trimmed
+ * {display, saleState} price block straight off the owner-list endpoint
+ * (AssetSummary.price); detail-shaped rows additionally have the hoisted
+ * saleState, and their full AssetPrice narrows the summary block.
  */
 export type PricedAsset = AssetSummary & {
-  price?: AssetPrice;
   saleState?: SaleState;
 };
 
