@@ -21,6 +21,16 @@ export interface VerifyResponse {
     stateCode: number;
     owner: string;
     timestamp: number;
+    // ── additive product fields (META-T38) — the verify surfaces already
+    // return these; older responses simply omit them. ADDITIVE ONLY.
+    name?: string;
+    image?: string;
+    brand?: string;
+    sku?: string;
+    /** Country of origin. */
+    origin?: string;
+    /** Display MSRP string as sent by the verifier. */
+    msrp?: string;
   };
   proof: {
     signature: string;
