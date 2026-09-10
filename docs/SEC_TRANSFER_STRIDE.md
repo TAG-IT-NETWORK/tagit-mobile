@@ -121,7 +121,8 @@ a CI grep-gate **on the accessor's import sites** (not the string "privateKey").
 5. Mobile ABI: add `transferAsset` + `AssetResold`; decode-test `getAsset` field order.
 
 ## Explicitly forbidden in v1
-Session signers / delegated signing · approvals · `signMessage`/typed-data surface ·
+Session signers / delegated signing · approvals · typed-data / arbitrary `signMessage` surface
+(revised 2026-09-10: ONE scoped personal_sign path exists for owner actions — see the addendum) ·
 transfer via deep link · mainnet config · truncated addresses on the Confirm screen.
 
 ## Residual risks (accepted for the July-31 TESTNET demo — revisit before real users)
@@ -168,3 +169,40 @@ transfer via deep link · mainnet config · truncated addresses on the Confirm s
 ## Approval
 - [x] **APPROVED — Artem** (date: 2026-07-03, recorded in session + Notion task
       `3914…7fc2`)  /  [ ] CHANGES REQUESTED: ______________
+
+---
+
+## Addendum — owner-action message signing (2026-09-10)
+
+Scope: the owner manages an asset from the app — flag (report lost/stolen),
+list / delist (marketplace), recycle (24 h grace) and cancel-recycle — by
+signing a short message; tagit-services verifies it and the relayer executes
+the move. Nothing here moves funds or sends a transaction from the device.
+
+```
+OwnerActionsPanel (asset page) → OwnerActionScreen (params + "what happens")
+   └─> useOwnerAction.run()                          [src/owner-actions/hooks.ts]
+         ├─ message = ownerActionMessage(token, action, params, ts)   [src/owner-actions/message.ts]
+         │     "TAG IT owner action\ntoken: <id>\naction: <a>\nparams-sha256: <hex|none>\nts: <ms>"
+         │     (byte-for-byte parity with the server; golden vectors in __tests__)
+         ├─ signOwnerActionMessage(owner, message, prompt)             [src/wallet/sign-message.ts]
+         │     1. REFUSES any text that is not exactly the owner-action shape
+         │        (isOwnerActionMessage) BEFORE the key is read — this path can
+         │        never sign a permit, a login challenge or typed data;
+         │     2. reads the key (OS biometric / passcode prompt = the consent gate);
+         │     3. REFUSES if the key does not own the address the screen showed.
+         └─ POST /api/v1/assets/:id/owner-actions {action, params, owner, signature, timestamp, source:"app"}
+               server: signature ↔ message ↔ owner · ownerOf(token) == owner on-chain ·
+               15-min window · (token, action, ts) unique · per-IP limiter → relayer executes
+```
+
+STRIDE deltas vs. the transfer model:
+- **Spoofing** — a signature is only useful for one of the five actions on a token the key owns *at execution time*; the server re-reads `ownerOf`, so a stale signature from a previous owner is refused (403).
+- **Tampering** — params are hashed inside the signed text; the server rebuilds the message from the submitted params, so any edit invalidates the signature (400).
+- **Repudiation** — message + signature are stored per action server-side; executed moves carry a tx hash.
+- **Replay** — 15-minute window + uniqueness on (token, action, ts) (400 / 409).
+- **DoS** — 10 actions per minute per IP on the server; the screen ignores a second tap while signing.
+- **Stolen unlocked phone** (residual) — the thief can flag / list / schedule a recycle. Recycle is the only terminal move and runs after a 24 h grace the owner can cancel from any device holding the wallet; a wrongful flag is resolved by the brand from the console; listing pays out only to the owner's wallet. No wallet backup/export yet — see ROADMAP.
+- **Malicious screen inside the app** — cannot reuse the signer for other text (scope fence) nor for another address (key ↔ expected-signer check); both are unit-tested without touching the keystore.
+
+Still forbidden: typed-data signing, arbitrary `signMessage`, session keys, approvals, deep-link-initiated actions.

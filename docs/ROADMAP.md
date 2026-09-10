@@ -15,6 +15,12 @@ PRs: app `tagit-mobile#1` (open) · backend `tagit-services#9` ✅ merged · bac
 
 ## ✅ Shipped & verified
 
+### Owner actions from the app (2026-09-10)
+- [x] **Manage** section on the asset page for the on-chain owner: Report lost or stolen (flag), List for sale / Remove from sale, Recycle (24 h grace, cancel from the asset page), Cancel recycling
+- [x] Signed with the device key (EIP-191 personal_sign, OS biometric / passcode prompt) — no gas, no funds move; `src/wallet/sign-message.ts` signs ONLY messages in the owner-action shape
+- [x] Backend rail: `POST /api/v1/assets/:id/owner-actions` on api.tagit.network verifies signature + `ownerOf` and executes via the relayer (tagit-services PR #73); message builder pinned to server golden vectors (`src/owner-actions/__tests__`)
+- [ ] Next: push notification when a scheduled recycle executes or a listing sells; resale settlement via the ERC-4337 account + paymaster (WP4-A)
+
 ### v1 foundation
 - [x] App foundation: `onchain/` viem module, polyfills (`index.js`), Zustand, pnpm-monorepo `metro.config.js`
 - [x] 5-tab nav (Vault · Market · Tap · Agents · Ask); NFC verify flow preserved in Tap tab
@@ -67,7 +73,7 @@ PRs: app `tagit-mobile#1` (open) · backend `tagit-services#9` ✅ merged · bac
 - [ ] Merge `tagit-mobile#1` once on-device pass is green
 
 ### C. Polish (v1.x)
-- [ ] "Report stolen" / recovery action on asset detail (wire `TAGITRecovery` + Recovery Resolver agent)
+- [x] "Report stolen" action on asset detail — shipped 2026-09-10 as an owner action (flag via the relayer; resolve stays on the console). `TAGITRecovery` wiring still open
 - [ ] Pull-to-refresh + caching on the Vault; skeleton loaders
 - [ ] Wallet backup/export affordance (embedded EOA has no recovery if device lost)
 - [ ] TAG IT branding pass (logo, splash, app icon) to match the dashboard
