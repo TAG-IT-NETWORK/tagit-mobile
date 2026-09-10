@@ -17,7 +17,7 @@ Create `tagit-mobile/.env` (values are baked in at build time):
 
 ```bash
 # Backend (live Cloud Run instance)
-EXPO_PUBLIC_API_URL=https://tagit-services-31154571939.us-central1.run.app
+EXPO_PUBLIC_API_URL=https://api.tagit.network
 EXPO_PUBLIC_API_KEY=<the services API key>
 
 # Optional — faster/keyed Base Sepolia RPC for direct reads (default: public RPC)

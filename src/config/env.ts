@@ -7,7 +7,7 @@
  */
 export const API_URL =
   process.env.EXPO_PUBLIC_API_URL ??
-  "https://tagit-services-31154571939.us-central1.run.app";
+  "https://api.tagit.network";
 export const API_KEY = process.env.EXPO_PUBLIC_API_KEY ?? "";
 
 /**
