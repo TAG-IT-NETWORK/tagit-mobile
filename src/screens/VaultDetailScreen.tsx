@@ -14,6 +14,7 @@ import { detailImageUri } from "../vault/display";
 import { AssetImage } from "../components/AssetImage";
 import { useWallet } from "../wallet/useWallet";
 import { ProvenanceTimeline } from "../components/ProvenanceTimeline";
+import { OwnerActionsPanel } from "../components/OwnerActionsPanel";
 import { stateColor, stateLabel } from "../vault/lifecycle";
 import { STATE_CLAIMED } from "../wallet/transfer";
 import { shortenAddress, shortenHash } from "../config/constants";
@@ -24,8 +25,8 @@ import type { VaultStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<VaultStackParamList, "AssetDetail">;
 
 export function VaultDetailScreen({ route, navigation }: Props) {
-  const { tokenId } = route.params;
-  const { asset, loading, error } = useAssetDetail(tokenId);
+  const { tokenId, refresh } = route.params;
+  const { asset, loading, error } = useAssetDetail(tokenId, refresh);
   const { activeAddress } = useWallet();
 
   // Transfer is offered only for a CLAIMED asset the ACTIVE wallet actually
@@ -100,6 +101,14 @@ export function VaultDetailScreen({ route, navigation }: Props) {
           <Text style={styles.sendText}>Send / Transfer</Text>
         </Pressable>
       ) : null}
+
+      <OwnerActionsPanel
+        tokenId={asset.tokenId}
+        stateCode={asset.stateCode}
+        owner={asset.owner}
+        activeAddress={activeAddress}
+        onAction={(action) => navigation.navigate("OwnerAction", { tokenId: asset.tokenId, assetName: asset.name, action })}
+      />
 
       <View style={styles.facts}>
         <Fact label="Token ID" value={`#${asset.tokenId}`} />

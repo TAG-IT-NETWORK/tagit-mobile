@@ -74,7 +74,7 @@ interface DetailState {
 }
 
 /** Load detail + provenance for one token. */
-export function useAssetDetail(tokenId: string): DetailState {
+export function useAssetDetail(tokenId: string, refresh?: number): DetailState {
   const [asset, setAsset] = useState<AssetDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export function useAssetDetail(tokenId: string): DetailState {
     return () => {
       cancelled = true;
     };
-  }, [tokenId]);
+  }, [tokenId, refresh]);
 
   return { asset, loading, error };
 }
