@@ -5,9 +5,9 @@
  */
 import { useCallback, useRef, useEffect } from "react";
 import { useChatStore } from "./store";
-import { streamAsk, type AskAssetContext } from "../services/ask";
+import { streamAsk } from "../services/ask";
 
-export function useAsk(assetContext?: AskAssetContext) {
+export function useAsk(assetTokenId?: string) {
   const messages = useChatStore((s) => s.messages);
   const streaming = useChatStore((s) => s.streaming);
   const closeRef = useRef<(() => void) | null>(null);
@@ -18,16 +18,16 @@ export function useAsk(assetContext?: AskAssetContext) {
       if (!trimmed) return;
       const store = useChatStore.getState();
 
-      store.addMessage({ role: "user", content: trimmed, assetTokenId: assetContext?.tokenId });
+      store.addMessage({ role: "user", content: trimmed, assetTokenId });
       // History sent upstream = everything so far (user + prior assistant turns).
       const history = useChatStore
         .getState()
         .messages.map((m) => ({ role: m.role, content: m.content }));
 
-      store.addMessage({ role: "assistant", content: "", assetTokenId: assetContext?.tokenId });
+      store.addMessage({ role: "assistant", content: "", assetTokenId });
       store.setStreaming(true);
 
-      closeRef.current = streamAsk(history, assetContext, {
+      closeRef.current = streamAsk(history, assetTokenId, {
         onDelta: (chunk) => useChatStore.getState().appendToLast(chunk),
         onDone: () => useChatStore.getState().setStreaming(false),
         onError: (message) => {
@@ -40,7 +40,7 @@ export function useAsk(assetContext?: AskAssetContext) {
         },
       });
     },
-    [assetContext],
+    [assetTokenId],
   );
 
   const stop = useCallback(() => {

@@ -9,6 +9,12 @@ export const API_URL =
   process.env.EXPO_PUBLIC_API_URL ??
   "https://api.tagit.network";
 export const API_KEY = process.env.EXPO_PUBLIC_API_KEY ?? "";
+/**
+ * App-tier key for POST /api/v1/ask (the only endpoint that costs LLM tokens).
+ * Injected at build time from the EAS environment (EXPO_PUBLIC_ASK_KEY) —
+ * never committed. Low privilege: it authorizes Ask and nothing else.
+ */
+export const ASK_KEY = process.env.EXPO_PUBLIC_ASK_KEY ?? "";
 
 /**
  * Web verifier base (verify.tagit.network). Real NTAG 424 DNA chips emit an
