@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,11 +12,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAsk } from "../chat/useAsk";
-import { useAssetDetail } from "../vault/useVault";
 import { ChatBubble } from "../components/ChatBubble";
 import { colors } from "../theme/colors";
 import { spacing, radius, fontSize } from "../theme/spacing";
-import type { AskAssetContext } from "../services/ask";
 import type { AskStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<AskStackParamList, "Chat">;
@@ -29,24 +27,10 @@ const SUGGESTIONS = [
 
 export function ChatScreen({ route }: Props) {
   const assetTokenId = route.params?.assetTokenId;
-  // When opened from an asset, fetch its facts to ground the conversation.
-  const { asset } = useAssetDetail(assetTokenId ?? "");
+  // Grounding happens server-side: the backend loads the asset by tokenId
+  // through the same visibility-gated serializer the Vault uses (META-T28).
 
-  const assetContext: AskAssetContext | undefined = useMemo(() => {
-    if (!assetTokenId || !asset) return undefined;
-    return {
-      tokenId: asset.tokenId,
-      lifecycleState: asset.lifecycleState,
-      owner: asset.owner,
-      name: asset.name,
-      description: asset.description,
-      tagHash: asset.tagHash,
-      attributes: asset.attributes,
-      provenance: asset.provenance?.map((p) => ({ label: p.label, timestamp: p.timestamp })),
-    };
-  }, [assetTokenId, asset]);
-
-  const { messages, streaming, send } = useAsk(assetContext);
+  const { messages, streaming, send } = useAsk(assetTokenId);
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
 

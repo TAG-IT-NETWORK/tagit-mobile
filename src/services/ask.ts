@@ -1,21 +1,12 @@
 /**
  * Streaming client for POST /api/v1/ask (Server-Sent Events).
  * Backend emits: event "delta" {text}, "done" {}, "error" {message}.
+ * Grounding: the server loads the asset by `tokenId` (see ask-request.ts).
  */
 import EventSource from "react-native-sse";
-import { API_URL, API_KEY } from "../config/env";
+import { API_URL, API_KEY, ASK_KEY } from "../config/env";
 import type { ChatMessage } from "../chat/store";
-
-export interface AskAssetContext {
-  tokenId?: string;
-  lifecycleState?: string;
-  owner?: string;
-  name?: string;
-  description?: string;
-  tagHash?: string;
-  attributes?: Array<{ trait_type: string; value: string | number }>;
-  provenance?: Array<{ label: string; timestamp?: number }>;
-}
+import { askAuthHeaders, askErrorMessage, buildAskBody } from "./ask-request";
 
 export interface AskHandlers {
   onDelta: (text: string) => void;
@@ -31,16 +22,16 @@ type AskEvent = "delta" | "done" | "error";
  */
 export function streamAsk(
   messages: Pick<ChatMessage, "role" | "content">[],
-  assetContext: AskAssetContext | undefined,
+  tokenId: string | undefined,
   handlers: AskHandlers,
 ): () => void {
   const es = new EventSource<AskEvent>(`${API_URL}/api/v1/ask`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+      ...askAuthHeaders(ASK_KEY, API_KEY),
     },
-    body: JSON.stringify({ messages, assetContext }),
+    body: buildAskBody(messages, tokenId),
     // We manage the connection lifecycle; no auto-reconnect polling.
     pollingInterval: 0,
     // Fail cleanly instead of hanging forever if the server stops streaming
@@ -66,16 +57,23 @@ export function streamAsk(
   });
 
   es.addEventListener("error", (event) => {
-    let message = "Connection error";
-    const data = (event as { data?: string }).data;
-    if (data) {
+    // Three shapes arrive here: our SSE "error" frame ({data: '{"message"}'}),
+    // a transport ErrorEvent ({xhrStatus, message}) for non-200 responses, or
+    // a timeout. Prefer the server's own message, then map the status.
+    const ev = event as { data?: string; xhrStatus?: number; message?: string; type?: string };
+    let serverMessage: string | undefined;
+    if (ev.data) {
       try {
-        message = (JSON.parse(data) as { message?: string }).message ?? message;
+        serverMessage = (JSON.parse(ev.data) as { message?: string }).message;
       } catch {
-        /* keep default */
+        /* not our frame */
       }
     }
-    handlers.onError(message);
+    handlers.onError(
+      ev.type === "timeout"
+        ? "The answer took too long — please try again."
+        : askErrorMessage(ev.xhrStatus, serverMessage),
+    );
     close();
   });
 
