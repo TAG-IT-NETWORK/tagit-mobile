@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAssetDetail } from "../vault/useVault";
+import { useOnChainOwner } from "../vault/useOnChainOwner";
 import { detailImageUri } from "../vault/display";
 import { AssetImage } from "../components/AssetImage";
 import { useWallet } from "../wallet/useWallet";
@@ -28,6 +29,11 @@ export function VaultDetailScreen({ route, navigation }: Props) {
   const { tokenId, refresh } = route.params;
   const { asset, loading, error } = useAssetDetail(tokenId, refresh);
   const { activeAddress } = useWallet();
+  // Ownership gates read the chain: the API renders the owner truncated on
+  // its public tier ("0x3Ed1…F113"), which can never equal a wallet address.
+  const onChain = useOnChainOwner(tokenId, refresh);
+  const owner = onChain?.owner ?? asset?.owner ?? "";
+  const stateCode = onChain?.stateCode ?? asset?.stateCode ?? 0;
 
   // Transfer is offered only for a CLAIMED asset the ACTIVE wallet actually
   // owns (so it can sign). When a DEV_OWNER override shows someone else's
@@ -35,8 +41,8 @@ export function VaultDetailScreen({ route, navigation }: Props) {
   const canTransfer =
     !!asset &&
     !!activeAddress &&
-    asset.stateCode === STATE_CLAIMED &&
-    asset.owner.toLowerCase() === activeAddress.toLowerCase();
+    stateCode === STATE_CLAIMED &&
+    owner.toLowerCase() === activeAddress.toLowerCase();
 
   // Jump to the Ask tab, grounded on this asset (cross-navigator hop).
   const askAboutThis = () => {
@@ -104,15 +110,15 @@ export function VaultDetailScreen({ route, navigation }: Props) {
 
       <OwnerActionsPanel
         tokenId={asset.tokenId}
-        stateCode={asset.stateCode}
-        owner={asset.owner}
+        stateCode={stateCode}
+        owner={owner}
         activeAddress={activeAddress}
         onAction={(action) => navigation.navigate("OwnerAction", { tokenId: asset.tokenId, assetName: asset.name, action })}
       />
 
       <View style={styles.facts}>
         <Fact label="Token ID" value={`#${asset.tokenId}`} />
-        <Fact label="Owner" value={shortenAddress(asset.owner)} />
+        <Fact label="Owner" value={shortenAddress(owner)} />
         {asset.tagHash ? <Fact label="NFC tag" value={shortenHash(asset.tagHash)} /> : null}
       </View>
 

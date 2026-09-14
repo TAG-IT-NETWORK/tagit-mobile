@@ -9,7 +9,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useOwnerActionsFeed, useSaleState } from "../owner-actions/hooks";
-import { availableActions } from "../owner-actions/rules";
+import { availableActions, unavailableReason } from "../owner-actions/rules";
 import { ACTION_COPY } from "../owner-actions/copy";
 import type { OwnerActionKind } from "../owner-actions/message";
 import { colors } from "../theme/colors";
@@ -44,14 +44,10 @@ export function OwnerActionsPanel({ tokenId, stateCode, owner, activeAddress, on
 
   if (!isOwner) return null;
 
-  const actions = availableActions({
-    stateCode,
-    isOwner,
-    saleState: sale.saleState,
-    pendingRecycle: feed.pendingRecycle !== null,
-  });
+  const ctx = { stateCode, isOwner, saleState: sale.saleState, pendingRecycle: feed.pendingRecycle !== null };
+  const actions = availableActions(ctx);
+  const reason = unavailableReason(ctx);
   const recent = feed.actions.slice(0, 3);
-  if (actions.length === 0 && recent.length === 0) return null;
 
   const pending = feed.pendingRecycle;
   const when = pending?.executeAt ? new Date(pending.executeAt).toLocaleString() : null;
@@ -71,6 +67,13 @@ export function OwnerActionsPanel({ tokenId, stateCode, owner, activeAddress, on
         <View style={styles.banner}>
           <Ionicons name="time-outline" size={18} color={colors.warning} />
           <Text style={styles.bannerText}>Recycling scheduled{when ? ` for ${when}` : ""}. Cancel below to keep the asset.</Text>
+        </View>
+      ) : null}
+
+      {reason ? (
+        <View style={styles.infoRow}>
+          <Ionicons name="information-circle-outline" size={16} color={colors.textMuted} />
+          <Text style={styles.infoText}>{reason}</Text>
         </View>
       ) : null}
 
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
   section: { marginTop: spacing.xl },
   sectionTitle: { color: colors.text, fontSize: fontSize.lg, fontWeight: "700", marginBottom: spacing.md },
   infoRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs, marginBottom: spacing.sm },
-  infoText: { color: colors.textSecondary, fontSize: fontSize.md },
+  infoText: { color: colors.textSecondary, fontSize: fontSize.md, flex: 1 },
   banner: {
     flexDirection: "row",
     alignItems: "center",

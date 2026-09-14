@@ -1,4 +1,4 @@
-import { availableActions, STATE } from "../rules";
+import { availableActions, unavailableReason, STATE } from "../rules";
 import { LIFECYCLE_STATES } from "../../config/constants";
 import { STATE_CLAIMED } from "../../wallet/transfer";
 
@@ -40,5 +40,22 @@ describe("availableActions", () => {
   });
   it("a scheduled recycle collapses everything to cancel-recycle", () => {
     expect(availableActions({ ...base, pendingRecycle: true, saleState: "listed" })).toEqual(["cancel-recycle"]);
+  });
+});
+
+describe("unavailableReason (Manage section stays discoverable)", () => {
+  const base = { stateCode: STATE.CLAIMED, isOwner: true, saleState: "not-listed" as const, pendingRecycle: false };
+  it("is null whenever an action exists", () => {
+    expect(unavailableReason(base)).toBeNull();
+    expect(unavailableReason({ ...base, stateCode: STATE.BOUND })).toBeNull();
+    expect(unavailableReason({ ...base, pendingRecycle: true })).toBeNull();
+  });
+  it("explains flagged / recycled / not-yet-activated", () => {
+    expect(unavailableReason({ ...base, stateCode: STATE.FLAGGED })).toMatch(/flagged/i);
+    expect(unavailableReason({ ...base, stateCode: STATE.RECYCLED })).toMatch(/recycled/i);
+    expect(unavailableReason({ ...base, stateCode: 1 })).toMatch(/activated/i);
+  });
+  it("is null for a non-owner (section hidden entirely)", () => {
+    expect(unavailableReason({ ...base, isOwner: false, stateCode: STATE.FLAGGED })).toBeNull();
   });
 });

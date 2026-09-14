@@ -32,3 +32,20 @@ export function availableActions(ctx: OwnerActionContext): OwnerActionKind[] {
   out.push("flag", "recycle");
   return out;
 }
+
+/**
+ * Why the owner has nothing to do right now — shown in the Manage section so
+ * the section is discoverable even when no action applies. null = actions exist.
+ */
+export function unavailableReason(ctx: OwnerActionContext): string | null {
+  if (!ctx.isOwner) return null;
+  if (availableActions(ctx).length > 0) return null;
+  switch (ctx.stateCode) {
+    case STATE.FLAGGED:
+      return "This asset is flagged. The brand is reviewing it — nothing to manage until the report is resolved.";
+    case STATE.RECYCLED:
+      return "This asset has been recycled and retired. No further actions.";
+    default:
+      return "Owner actions unlock once the asset is bound and activated.";
+  }
+}
