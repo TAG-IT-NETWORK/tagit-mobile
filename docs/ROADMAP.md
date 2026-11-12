@@ -6,7 +6,7 @@ later phases. See `DEV_BUILD.md` to run it; the build plan that produced v1 is a
 `~/.claude/plans/wild-spinning-hopcroft.md`.
 
 **Currently live (2026-06-01):**
-- Backend: `https://tagit-services-31154571939.us-central1.run.app` (Cloud Run, auto-deploy on `main` merges via Cloud Build)
+- Backend: `https://api.tagit.network` (tagit-services on Vercel, CLI deploys only). The original Cloud Run host `tagit-services-31154571939.us-central1.run.app` and its Cloud Build auto-deploy were decommissioned on 2026-11-12; the app has pointed at api.tagit.network since #21 (2026-09-10).
 - App: `feat/customer-app-v1` on `TAG-IT-NETWORK/tagit-mobile` — installed as ORACULAR dev build on Android, currently connecting Metro
 
 PRs: app `tagit-mobile#1` (open) · backend `tagit-services#9` ✅ merged · backend hotfix `tagit-services#10` ✅ merged.
@@ -30,12 +30,12 @@ PRs: app `tagit-mobile#1` (open) · backend `tagit-services#9` ✅ merged · bac
 - [x] Email-verifier backend + AA counterfactual-address read
 - [x] 18 unit tests, tsc clean, Metro bundle builds (iOS + Android)
 
-### Backend live on Cloud Run
+### Backend live (on Cloud Run until 2026-11-12; now api.tagit.network on Vercel)
 - [x] `GET /api/v1/assets[/:tokenId]` — 20 assets returned for the dev-owner address, 9-event provenance for token #1
 - [x] **Lifecycle events in provenance** (StateChanged + TagBound via Blockscout contract-logs API — no keyed RPC needed)
 - [x] `POST /api/v1/ask` — streaming Anthropic responses; `ANTHROPIC_API_KEY` bound from **GCP Secret Manager** (secret `App_Claude_agent`)
 - [x] `POST /api/v1/wallet/email/{start,verify}` + `GET /status` — `isEmailVerified` read verified live (verify path gated until `EMAIL_VERIFIER_PRIVATE_KEY` is set)
-- [x] **Cloud Build auto-deploy from `main`** — `Connect to repo` wired; future PR merges auto-build & deploy
+- [x] ~~**Cloud Build auto-deploy from `main`**~~ — retired 2026-11-12 together with the Cloud Run service; tagit-services production now deploys only via the Vercel CLI (merges deploy nothing)
 - [x] Dockerfile husky bug fixed (PR #10) — `--ignore-scripts` in runtime stage
 
 ### Mobile dev build
