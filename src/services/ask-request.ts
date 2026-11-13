@@ -19,7 +19,10 @@ export function buildAskBody(messages: AskTurn[], tokenId?: string): string {
   return JSON.stringify(tokenId && /^\d+$/.test(tokenId) ? { messages: history, tokenId } : { messages: history });
 }
 
-/** Authorization header for Ask: the app-tier key, else the general key, else none. */
+/**
+ * Authorization header for the services consumer-app surface (Ask, Tap-verify,
+ * wallet-email): the app-tier key, else the legacy general key, else none.
+ */
 export function askAuthHeaders(askKey: string, apiKey: string): Record<string, string> {
   const key = askKey || apiKey;
   return key ? { Authorization: `Bearer ${key}` } : {};

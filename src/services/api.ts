@@ -1,4 +1,5 @@
-import { API_URL, API_KEY } from "../config/env";
+import { API_URL, API_KEY, ASK_KEY } from "../config/env";
+import { askAuthHeaders } from "./ask-request";
 import type { VerifyRequest, VerifyResponse } from "../types/api";
 import type { SunData } from "../types/nfc";
 import type { Challenge } from "../types/challenge";
@@ -39,12 +40,12 @@ export function buildVerifyRequest(
 /** POST to /api/v1/verify and return the structured response */
 export async function verifyAsset(request: VerifyRequest): Promise<VerifyResponse> {
   const url = `${API_URL}/api/v1/verify`;
+  // App-tier key first (tagit-services #103 accepts it on /api/v1/verify);
+  // the legacy general key only as a fallback for dev builds.
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    ...askAuthHeaders(ASK_KEY, API_KEY),
   };
-  if (API_KEY) {
-    headers["Authorization"] = `Bearer ${API_KEY}`;
-  }
 
   const res = await fetch(url, {
     method: "POST",
