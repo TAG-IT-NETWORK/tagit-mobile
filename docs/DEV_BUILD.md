@@ -9,14 +9,14 @@ the Vault · Tap · Ask flow running end-to-end against the live backend.
 - Node 20, `pnpm`, and the EAS CLI: `npm i -g eas-cli`
 - An Expo account: `eas login`
 - A physical iPhone or Android device (NFC for the Tap flow)
-- The backend is already live at the Cloud Run URL below — no local server needed
+- The backend is already live at `https://api.tagit.network` (below) — no local server needed
 
 ## 1. Environment
 
 Create `tagit-mobile/.env` (values are baked in at build time):
 
 ```bash
-# Backend (live Cloud Run instance)
+# Backend (live: api.tagit.network — tagit-services on Vercel)
 EXPO_PUBLIC_API_URL=https://api.tagit.network
 EXPO_PUBLIC_API_KEY=<the services API key>
 
