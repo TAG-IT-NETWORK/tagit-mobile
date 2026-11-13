@@ -4,12 +4,15 @@
  *   POST /api/v1/wallet/email/verify { email, otp }
  *   GET  /api/v1/wallet/email/status?email=
  */
-import { API_URL, API_KEY } from "../config/env";
+import { API_URL, API_KEY, ASK_KEY } from "../config/env";
+import { askAuthHeaders } from "./ask-request";
 
+// App-tier key first (tagit-services #103 accepts it on /api/v1/wallet/email/*);
+// the legacy general key only as a fallback for dev builds.
 function headers(): Record<string, string> {
   return {
     "Content-Type": "application/json",
-    ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+    ...askAuthHeaders(ASK_KEY, API_KEY),
   };
 }
 

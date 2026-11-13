@@ -8,11 +8,18 @@
 export const API_URL =
   process.env.EXPO_PUBLIC_API_URL ??
   "https://api.tagit.network";
+/**
+ * Legacy general key (EXPO_PUBLIC_API_KEY). Since tagit-services #103 every
+ * route the app calls accepts the app-tier key below, so public builds must
+ * leave this EMPTY — an admin-tier value here is extractable from the bundle.
+ * Kept only as a fallback for local dev builds against a test server.
+ */
 export const API_KEY = process.env.EXPO_PUBLIC_API_KEY ?? "";
 /**
- * App-tier key for POST /api/v1/ask (the only endpoint that costs LLM tokens).
- * Injected at build time from the EAS environment (EXPO_PUBLIC_ASK_KEY) —
- * never committed. Low privilege: it authorizes Ask and nothing else.
+ * App-tier key for the consumer-app surface of tagit-services: POST
+ * /api/v1/ask, POST /api/v1/verify and /api/v1/wallet/email/*. Injected at
+ * build time from the EAS environment (EXPO_PUBLIC_ASK_KEY) — never committed.
+ * Low privilege by design: it unlocks nothing else on the server.
  */
 export const ASK_KEY = process.env.EXPO_PUBLIC_ASK_KEY ?? "";
 

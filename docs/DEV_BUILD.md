@@ -18,7 +18,10 @@ Create `tagit-mobile/.env` (values are baked in at build time):
 ```bash
 # Backend (live: api.tagit.network — tagit-services on Vercel)
 EXPO_PUBLIC_API_URL=https://api.tagit.network
-EXPO_PUBLIC_API_KEY=<the services API key>
+# App-tier key (the services ASK_APP_KEY): unlocks Ask, Tap-verify and wallet-email,
+# nothing else. Never put the services master key in a build — it is extractable.
+EXPO_PUBLIC_ASK_KEY=<the app-tier key>
+EXPO_PUBLIC_API_KEY=
 
 # Optional — faster/keyed Base Sepolia RPC for direct reads (default: public RPC)
 EXPO_PUBLIC_BASE_SEPOLIA_RPC=
